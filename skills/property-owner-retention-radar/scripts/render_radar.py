@@ -139,7 +139,7 @@ def main():
     dq = open(os.path.join(O, "data-quality.md")).read() if os.path.exists(os.path.join(O, "data-quality.md")) else ""
     cfg = json.load(open(a.config)) if a.config else {}; co = cfg.get("company", {}); brand = cfg.get("brand", {}); thr = cfg.get("risk_tiers", {"call": 50, "watch": 25})
     prev = json.load(open(a.previous)) if a.previous and os.path.exists(a.previous) else None
-    primary = brand.get("primary", "#0B2545"); accent = brand.get("accent", "#C7A008"); short = co.get("short_name", "the company")
+    primary = brand.get("primary", "#0B2545"); accent = brand.get("accent", "#4A5568"); short = co.get("short_name", "the company")
     as_of = inv.get("as_of", ""); today = dt.date.fromisoformat(as_of[:10]) if as_of else dt.date.today(); missing = [m for m in inv.get("missing", []) if m != "unit_directory"]
     P, R, V, S, C, D, DQ = company.get("portfolio", {}), company.get("renewals", {}), company.get("vacancy", {}), company.get("survey", {}) or {}, company.get("collections", {}), company.get("departures", {}), company.get("delinquency", {})
     certs = (cfg.get("newsletter", {}) or {}).get("certifications_to_feature", []) or []

@@ -39,7 +39,7 @@ def base_kind(p):
     return "home"
 
 def where(p):
-    """'single-family home at 421 W Elm St' when the directory carried an address, else '... in Testville'."""
+    """'single-family home at 100 Example St' when the directory carried an address, else '... in Testville'."""
     k = base_kind(p); a = re.sub(r"\s+", " ", (p.get("address") or "").strip()); c = (p.get("city") or "").strip()
     if a: return f"{k} at {a}" + (f" in {c}" if c and c.lower() not in a.lower() else "")
     return f"{k} in {c}" if c else k
@@ -276,7 +276,7 @@ def build_rows(company, owners, cfg, month, base_url, salt):
         coming = " ".join(recs) if recs else f"No leases end in the next {LEASE_HORIZON_DAYS} days and nothing is vacant. Nothing you need to decide this month; {mgr} will flag anything that changes."
         first = o["first_name"] or ""; token = hashlib.sha1(f"{salt}:{o['owner_id']}".encode()).hexdigest()[:16]
         pre = [f"{o['occupied']} of {o['units']} leased"] + ([f"{pct(collected)} of rent collected"] if collected is not None else []) + ["what is coming up"]
-        primary = cfg.get("brand", {}).get("primary", "#0B2545"); accent = cfg.get("brand", {}).get("accent", "#C7A008"); C = company.get("collections", {}) or {}
+        primary = cfg.get("brand", {}).get("primary", "#0B2545"); accent = cfg.get("brand", {}).get("accent", "#4A5568"); C = company.get("collections", {}) or {}
         all_units = [u for p in P for u in p.get("units_detail", [])]
         cmp_rows = [(f"Your {home_word}", collected, primary), (co.get("short_name", "Company") + " overall", C.get("rate_pct"), "#98A2B3")]
         if collected is None:
@@ -299,7 +299,7 @@ def build_rows(company, owners, cfg, month, base_url, salt):
                "report_line": (f"See your portfolio report: {base_url.rstrip('/')}/{token}.html" if nl.get("report_link") else ""),
                "closing_line": f"Questions about your {home_word}? Reply to this email or call {mgr_name} at {mgr_phone}.", "referral_line": nl.get("referral_line", ""),
                "company_name": co.get("name", ""), "company_phone": co.get("phone", ""), "logo_url": co.get("logo_url", ""),
-               "brand_primary": cfg.get("brand", {}).get("primary", "#0B2545"), "brand_accent": cfg.get("brand", {}).get("accent", "#C7A008"),
+               "brand_primary": cfg.get("brand", {}).get("primary", "#0B2545"), "brand_accent": cfg.get("brand", {}).get("accent", "#4A5568"),
                "font_display": cfg.get("brand", {}).get("font_display", "Georgia, serif"), "font_body": cfg.get("brand", {}).get("font_body", "Helvetica Neue, Arial, sans-serif"),
                "as_of": as_of, "benchmarks_as_of": BENCH.get("as_of") if BENCH_OK else "", "footer_note": "You receive this because we manage property for you.",
                "_needs_confirm": "[CONFIRM" in coming, "_radar_tier": o["tier"], "_properties": P, "_collected": collected, "_company_collections": C,
@@ -344,14 +344,14 @@ def studio(rows, excluded, tpl_html, tpl_txt, cfg, month, merged_log=()):
     return r"""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Owner Update Studio</title>
 <style>:root{--ink:#111827;--muted:#6b7280;--line:#e5e7eb;--bg:#f4f5f8;--pri:#0B2545}body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
 header{background:var(--pri);color:#fff;padding:14px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}header h1{font-size:16px;margin:0}header .m{color:#d1d5db;font-size:12.5px}select,button,input,textarea{font:inherit}select{padding:6px 8px;border-radius:8px;border:1px solid var(--line);min-width:260px}
-button{background:#fff;color:var(--pri);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-weight:700;cursor:pointer}button.p{background:#C7A008;color:#111;border:0}
+button{background:#fff;color:var(--pri);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-weight:700;cursor:pointer}button.p{background:var(--pri);color:#fff;border:0}
 main{display:grid;grid-template-columns:420px 1fr;gap:0;height:calc(100vh - 108px)}@media(max-width:900px){main{grid-template-columns:1fr;height:auto}}
 aside{overflow:auto;background:#fff;border-right:1px solid var(--line);padding:14px 16px}aside h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
-.f{margin-bottom:9px}.f label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:2px}.f input,.f textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:6px 8px}.f textarea{min-height:64px;resize:vertical}.f.edited input,.f.edited textarea{border-color:#C7A008;background:#fffbea}
+.f{margin-bottom:9px}.f label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:2px}.f input,.f textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:6px 8px}.f textarea{min-height:64px;resize:vertical}.f.edited input,.f.edited textarea{border-color:#B54708;background:#fffbea}
 .stage{overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}iframe{width:100%;height:calc(100vh - 150px);min-height:600px;border:1px solid var(--line);border-radius:12px;background:#fff}
 .meta{display:flex;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}.pill{background:#eef1fa;border-radius:999px;padding:2px 9px;color:var(--pri);font-weight:700}.flag{background:#fff3d6;color:#8a5300;border-radius:999px;padding:2px 9px;font-weight:700}
 .filters{display:flex;gap:8px;align-items:center;padding:8px 20px;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}.fl{font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}.pill{background:#f4f5f8;border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:600;color:#374151}.pill.on{background:var(--pri);color:#fff;border-color:var(--pri)}
-.ready{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#374151}.ready .bar{width:220px;height:10px;border-radius:5px;background:#eef0f4;overflow:hidden;display:flex}.ready .bar i{display:block;height:100%}.ready .ok{background:#067647}.ready .need{background:#C7A008}
+.ready{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#374151}.ready .bar{width:220px;height:10px;border-radius:5px;background:#eef0f4;overflow:hidden;display:flex}.ready .bar i{display:block;height:100%}.ready .ok{background:#067647}.ready .need{background:#B54708}
 .toast{position:fixed;bottom:16px;right:16px;background:#111827;color:#fff;padding:10px 14px;border-radius:10px;opacity:0;transition:opacity .2s}.toast.on{opacity:1}details{margin-top:10px;font-size:12.5px;color:var(--muted)}</style></head><body>
 <header><h1>Owner Update Studio</h1><span class="m" id="company"></span><select id="pick"></select><span class="m" id="count"></span><span style="flex:1"></span><button id="txt">Plain text</button><button id="reset">Reset owner</button><button class="p" id="export">Export merge CSV</button><button id="exportjson">Export JSON</button></header>
 <div class="filters"><span class="fl">Show</span><button class="pill on" data-f="all">All</button><button class="pill" data-f="confirm">Needs a sentence</button><button class="pill" data-f="call">Radar: call this week</button><button class="pill" data-f="edited">Edited</button><button class="pill" data-f="nosurvey">No survey</button><span style="flex:1"></span><div class="ready" id="ready"></div></div>

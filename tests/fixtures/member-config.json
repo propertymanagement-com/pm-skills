@@ -35,9 +35,9 @@
  },
  "rent_gl_account": "4100",
  "fees": {
-  "management_pct": 6,
+  "management_pct": 10,
   "leasing_fee": "one month's rent",
-  "renewal_fee": "$299"
+  "renewal_fee": "$100"
  },
  "risk_weights": {
   "management_ending": 50,
