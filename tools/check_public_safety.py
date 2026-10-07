@@ -53,7 +53,7 @@ PHRASE_DENY = {
 
 EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+-]+@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})")
 PHONE_RE = re.compile(r"(?<!\d)(?:\+1[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}(?!\d)")
-PMID_RE = re.compile(r'"pmid"\s*:\s*(\d+)')
+PMID_RE = re.compile(r'\bpmid\b["\']?\s*[:=#]?\s*["\']?(\d{3,})', re.IGNORECASE)
 ALLOWED_EMAIL_DOMAINS = {"example.com", "example.org"}
 ALLOWED_PHONE_PREFIX = re.compile(r"^\+?1?[\s.-]?555-01\d{2}[\s.-]?\d{4}$")
 

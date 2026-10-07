@@ -1,3 +1,4 @@
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
@@ -22,11 +23,24 @@ def test_public_safety_passes_on_repo():
 def test_public_safety_fails_on_bad_fixture(tmp_path):
     bad_dir = tmp_path / "bad"
     bad_dir.mkdir()
-    # Synthetic leak content — never committed; exercises the denylist + email rules.
+    # Never put real client names, PMIDs, or domains in this repo, even in tests.
     (bad_dir / "leak.txt").write_text(
-        "Landmark Property Management pmid 4192 owners@landmarkrgc.com Adam Sieger\n",
+        "pmid 123456 owners@acme-realty.test call 312-555-9876\n",
         encoding="utf-8",
     )
     proc = run_check(bad_dir)
     assert proc.returncode != 0
-    assert "denylisted" in proc.stderr.lower() or "email" in proc.stderr.lower()
+    stderr = proc.stderr.lower()
+    assert "email outside" in stderr
+    assert "pmid 123456" in stderr
+    assert "phone outside" in stderr
+
+
+def test_denylist_matches_hashed_token():
+    spec = importlib.util.spec_from_file_location("check_public_safety", CHECK)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    mod.TOKEN_DENY.add(mod.h("zzfakeclientco"))
+    errors: list[str] = []
+    mod.check_denylist("Report for ZZFakeClientCo owners", "leak.txt", errors)
+    assert any("denylisted" in e for e in errors)
