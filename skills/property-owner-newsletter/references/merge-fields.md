@@ -19,11 +19,11 @@ Every column in `merge.csv` (and every key in `merge.json` rows). The template r
 
 | Field | What the builder puts there | Editable |
 |---|---|---|
-| `subject` | "Bonnie, your October 2026 property update from Acme PM" ("Your ..." when no first name) | yes |
+| `subject` | "Jane, your October 2026 property update from Example PM" ("Your ..." when no first name) | yes |
 | `preheader` | "3 of 4 leased, 84% of rent collected, and what is coming up." | yes |
 | `intro_line` | one sentence framing the email | yes |
-| `homes_paragraph` | one property: "Your single-family home at 421 W Elm St in Testville: leased at $1,850/mo, in line with market, with us since Aug 2023." Several: "Your properties: 5-unit building at ... (4 of 5 units leased, $10,184/mo total, rents in line with market, with us since Oct 2023); ..." (first six, then "and N more") | yes |
-| `coming_up` | up to two sentences from the recommendation rules (see `recommendation-rules.md`), or the quiet line: "No leases end in the next 90 days and nothing is vacant. Nothing you need to decide this month; Carlos will flag anything that changes." | yes |
+| `homes_paragraph` | one property: "Your single-family home at 100 Example St in Testville: leased at $1,850/mo, in line with market, with us since Aug 2023." Several: "Your properties: 5-unit building at ... (4 of 5 units leased, $10,184/mo total, rents in line with market, with us since Oct 2023); ..." (first six, then "and N more") | yes |
+| `coming_up` | up to two sentences from the recommendation rules (see `recommendation-rules.md`), or the quiet line: "No leases end in the next 90 days and nothing is vacant. Nothing you need to decide this month; Test will flag anything that changes." | yes |
 | `company_block` | the monthly company update from the config, identical in every row | yes (per row) |
 | `how_you_compare` | rent collected on this owner's homes vs the company vs the verified-PM median; the featured certifications; the owner-survey NPS vs all verified managers; renewals only when the company is within 5 points of the median | yes |
 | `closing_line` | "Questions about your home? Reply to this email or call Test Manager at ..." | yes |

@@ -12,7 +12,7 @@ Why owner-specific: a generic newsletter gets skimmed.
 
 ## Version handshake (every run)
 
-Call **`pm_skill_hello`** with `{ "skill": "property-owner-newsletter", "version": "0.1.0" }` before other work. If `is_latest` is false, mention once that a newer release exists; do not repeat in the same conversation. An email that says "your home at 421 W Elm St, leased at $1,850, lease ends Nov 30, we recommend renewing flat" gets read and replied to. Replies are the point: every reply is a retention conversation the company would otherwise never have.
+Call **`pm_skill_hello`** with `{ "skill": "property-owner-newsletter", "version": "0.1.0" }` before other work. If `is_latest` is false, mention once that a newer release exists; do not repeat in the same conversation. An email that says "your home at 100 Example St, leased at $1,850, lease ends Nov 30, we recommend renewing flat" gets read and replied to. Replies are the point: every reply is a retention conversation the company would otherwise never have.
 
 ## Before anything: permissions and files
 
@@ -120,7 +120,7 @@ Report back in this shape, then point them at the studio:
 
 ## Present it
 
-- **claude.ai (Team or Enterprise):** before writing anything else, read one preview (about 17 KB) and return it as an HTML artifact so the first thing on screen is the email exactly as an owner will see it; offer the other previews the same way. Never paste JSON or code into the reply. The studio embeds every owner (about 1.7 MB) and is a working tool, not a page to read, so it stays a file: point to `newsletter-studio.html` and explain that it opens in any browser. Artifacts can be shared to teammates in the workspace; the report pages are hosted by the company, never as public artifacts.
+- **claude.ai (Team or Enterprise):** before writing anything else, read one preview and return it as an HTML artifact so the first thing on screen is the email exactly as an owner will see it; offer the other previews the same way. Never paste JSON or code into the reply. The studio embeds every owner (it grows with the portfolio, often past a megabyte) and is a working tool, not a page to read, so it stays a file: point to `newsletter-studio.html` and explain that it opens in any browser. Artifacts can be shared to teammates in the workspace; the report pages are hosted by the company, never as public artifacts.
 - **Claude desktop / Claude Code:** open the studio directly.
 
 Everything here carries owner names and addresses. Share inside the company only.
@@ -139,9 +139,9 @@ Everything here carries owner names and addresses. Share inside the company only
 
 ## Answering questions about the send
 
-When the question is about one owner ("show me Dan's email", "what will the Testville building's update say"), the answer names that owner only. Everything else in the send is a count ("30 other rows still need a sentence, listed in the studio"), never a roster: a person asking about one owner did not ask to see the others, and a list of names in a reply travels further than the studio does.
+When the question is about one owner ("show me Jane's email", "what will the Testville building's update say"), the answer names that owner only. Everything else in the send is a count ("30 other rows still need a sentence, listed in the studio"), never a roster: a person asking about one owner did not ask to see the others, and a list of names in a reply travels further than the studio does.
 
-Once `merge.json` exists you can answer directly from it: "which owners have a vacancy over 30 days" (rows whose `coming_up` starts with a vacancy sentence), "who is getting a renewal recommendation" (`lease at your` in `coming_up`), "how many owners are under Carlos" (`manager_first`), "show me Bonnie's email" (open her preview or render the template with her row). For anything about why a number is what it is, `references/metric-definitions.md` has the definitions and `references/data-model.md` the fields.
+Once `merge.json` exists you can answer directly from it: "which owners have a vacancy over 30 days" (rows whose `coming_up` starts with a vacancy sentence), "who is getting a renewal recommendation" (`lease at your` in `coming_up`), "how many owners are under Test" (`manager_first`), "show me Jane's email" (open her preview or render the template with her row). For anything about why a number is what it is, `references/metric-definitions.md` has the definitions and `references/data-model.md` the fields.
 
 ## Changing behaviour
 

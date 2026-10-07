@@ -6,11 +6,11 @@ The horizon starts on the first day of the send month (`--month`), not on the da
 
 | Priority | Trigger (per property) | Sentence produced | Needs a human? |
 |---|---|---|---|
-| 1 | a unit vacant more than 30 days | "Your single-family home has been vacant 62 days." or "2 of 31 units at your 31-unit building at 923 State St have been vacant up to 62 days." (the rent roll shows 33 rows for that building; two are floor-plan placeholders the loader drops) + `[CONFIRM: the pricing or condition change being made to lease them.]` | yes, type the real plan |
+| 1 | a unit vacant more than 30 days | "Your single-family home has been vacant 62 days." or "2 of 12 units at your 12-unit building at 100 Example St have been vacant up to 62 days." (say the rent roll shows 14 rows for that building; two are floor-plan placeholders the loader drops) + `[CONFIRM: the pricing or condition change being made to lease them.]` | yes, type the real plan |
 | 2 | tenant balance above one month of rent | "A tenant balance of $2,400 is outstanding at your ..." + `[CONFIRM: the collection step under way and the next date.]` | yes |
 | 3 | a lease ending within 90 days of the send month | "The lease at your home ends Nov 30." (or "The next lease at your 5-unit building ...") followed by the stance below | no |
-| 4 | a unit vacant 30 days or fewer, or a home that has never had a tenant with the company | "Your home is between tenants (12 days so far); Carlos will send the leasing update.", "2 of 6 units at your ... are vacant; ...", or for a new onboarding "Your home is being leased for the first time with us; ..." | no |
-| none | nothing above | "No leases end in the next 90 days and nothing is vacant. Nothing you need to decide this month; Carlos will flag anything that changes." | no |
+| 4 | a unit vacant 30 days or fewer, or a home that has never had a tenant with the company | "Your home is between tenants (12 days so far); Test will send the leasing update.", "2 of 6 units at your ... are vacant; ...", or for a new onboarding "Your home is being leased for the first time with us; ..." | no |
+| none | nothing above | "No leases end in the next 90 days and nothing is vacant. Nothing you need to decide this month; Test will flag anything that changes." | no |
 
 ## Renewal stances (priority 3)
 
@@ -27,7 +27,7 @@ For a multi-unit building the wording switches to "rents" and the building avera
 
 ## Naming the property
 
-A single-property owner already read the address in the homes paragraph, so "Coming up" says "your home" / "your 4-unit building". An owner with several properties gets the address each time ("your single-family home at 12 Oak St in Testville") so there is no ambiguity.
+A single-property owner already read the address in the homes paragraph, so "Coming up" says "your home" / "your 4-unit building". An owner with several properties gets the address each time ("your single-family home at 100 Example St in Testville") so there is no ambiguity.
 
 ## Changing a stance
 

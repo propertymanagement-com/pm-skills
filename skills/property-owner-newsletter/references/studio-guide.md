@@ -12,7 +12,7 @@ For the person who reviews and sends the monthly owner update. Open `newsletter-
 
 ## What to do each month
 
-1. **Fill the company update** once, in the config (`newsletter.company_block`) before the build, so every row carries it. If you missed it, you can still type it per owner here, but that is 274 edits instead of one.
+1. **Fill the company update** once, in the config (`newsletter.company_block`) before the build, so every row carries it. If you missed it, you can still type it per owner here, but that is one edit per owner instead of one for the whole send.
 2. **Clear every `[CONFIRM]`.** The builder tells the person running it how many rows carry one; each is a vacancy over 30 days or a balance over a month's rent, and the sentence needs the real plan ("we dropped the asking rent to $1,650 and replaced the carpet"). Ask the property manager, type it in, move on. Rows still carrying `[CONFIRM]` must be removed from the send.
 3. **Skim the flagged owners.** The details line shows the Retention Radar tier. `Call this week` owners should hear from their manager before this email lands. Either call first or delete their row from the exported CSV.
 4. **Spot-check five.** Pick a single-home owner, the largest owner, a multi-property owner, one with a lease ending, one with a vacancy. Read each as the owner would. Fix anything that reads oddly; the fix applies to that owner only.

@@ -27,7 +27,7 @@ Caps: the renderer holds Call this week to `call_cap_total` (10) and `call_cap_p
 
 Judgment the model leaves to you: a written comment. The loader flags "left a written comment" at 0 points so you read it. If the comment changes the picture (a detractor whose complaint was resolved, a promoter who mentions selling), adjust the move and talk track, and say why on the card via the overrides file. Do not edit the score by hand; change the weights in the config if a signal is systematically wrong for this company.
 
-## Added 2026-09-30 after the first eval pass
+## Additional owner-directory signals
 
 Two owner-directory signals, both from fields the first version ignored:
 
@@ -39,20 +39,20 @@ Two owner-directory signals, both from fields the first version ignored:
 Two rules for how records are counted:
 
 - **One record per inbox.** AppFolio often holds one person as several owner records (a person plus their LLCs, or two records on one property). The loader merges records that share an email: every property once, signals de-duplicated by kind (a vacancy on a shared building counts once), score and tier recomputed. The merged record lists `merged_from`.
-- **Co-owners with different inboxes stay separate**, but each record carries `co_owners` (who else is on which property) so the card can say "one call covers Prewitt too".
+- **Co-owners with different inboxes stay separate**, but each record carries `co_owners` (who else is on which property) so the card can say "one call covers the co-owner too".
 
 Delinquency: a tenant in `Evict` status whose move-out date has passed is a former tenant. Their balance is legacy receivable, shown in the health strip's note, and no longer counts toward the owner's "balances exceed a month of rent" signal.
 
 Owner-directory Tags listed in the config's `watch_tags` are counted as a cohort in the Patterns section (for example a fee-waiver cohort with an end date), not scored per owner.
 
-Two more, added after comparing the first run against generic builds on the same data (both kept pointing at failed tenancies and turns that sit):
+Two more signals, added because early runs kept pointing at failed tenancies and turns that sit:
 
 | Signal | Points (config key) | Fires when | Why it matters |
 |---|---|---|---|
 | Turn work order open 45+ days | 10 (`turn_open_45d`) | a Unit Turn work order created more than 45 days ago is neither completed nor canceled | the owner experiences the open turn as the vacancy; it is the most visible thing the company controls |
 | Former tenant left a balance | 10 (`prior_tenant_loss`) | former tenants (Past, or Evict with a move-out behind us) left more than $3,000, and more than a month of the owner's rent, unpaid across the owner's properties | a failed tenancy hits the owner's wallet and their trust in screening at the same time |
 
-Refinements after the second run:
+Refinements from early runs:
 
 - **Tenure counts every property the owner ever had with the company**, not just the active ones, so a six-year owner who just added a building is not a "first year" owner; the card carries an informational "long-time owner, new property" line instead.
 - **Expiring leases** exclude units already on notice or moving out (those are departures, not renewals to start), rows on vacant units, and rows whose end date disagrees with the rent roll's current Lease To for that unit (the unit was re-leased; the row is the old tenant).

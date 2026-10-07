@@ -59,14 +59,14 @@ ZW_RE = re.compile(r"[\u200b\u200c\u200d\ufeff]")   # AppFolio directories carry
 def clean(v): return re.sub(r"\s+", " ", ZW_RE.sub("", str(v or ""))).strip()
 ENTITY_RE = re.compile(r"\b(LLC|L\.L\.C\.?|Inc\.?|Corp\.?|Co\.|Company|Trust|Properties|Property|Holdings|Investments?|Ventures|Capital|Partners|Group|Fund|Estates?|Realty|Management|Development|Enterprises|Rentals|Homes)\b", re.I)
 def pretty_name(v):
-    """'Breslin, Daniel' -> 'Daniel Breslin'; entity names and anything with more than one comma are left alone, and trust boilerplate is cut at the first clause."""
+    """'Doe, Jane' -> 'Jane Doe'; entity names and anything with more than one comma are left alone, and trust boilerplate is cut at the first clause."""
     v = clean(v)
     if ENTITY_RE.search(v) or v.count(",") != 1: return re.split(r",? as trustee| under trust| dated ", v, maxsplit=1)[0].strip(" ,")
     last, first = [x.strip() for x in v.split(",")]
     return f"{first} {last}".strip()
 
 def first_name_of(v):
-    """'Viet (Scott)' -> 'Scott': a nickname in parentheses is what the person is called."""
+    """'Robert (Bob)' -> 'Bob': a nickname in parentheses is what the person is called."""
     v = clean(v); m = re.search(r"\(([^)]+)\)", v)
     return (m.group(1) if m else v).strip().title()
 
