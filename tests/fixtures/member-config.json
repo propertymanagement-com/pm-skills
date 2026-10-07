@@ -10,9 +10,9 @@
   "logo_url": "https://www.example.com/logo.png"
  },
  "brand": {
-  "primary": "#1368A1",
-  "accent": "#4B575E",
-  "tint": "#D8E2E8",
+  "primary": "#0B2545",
+  "accent": "#4A5568",
+  "tint": "#E2E8F0",
   "font_display": "Georgia, serif",
   "font_body": "Helvetica, Arial, sans-serif"
  },
