@@ -1,0 +1,30 @@
+{{subject}}
+
+{{first_name}}, here is where things stand with your {{home_word}}.
+
+{{intro_line}}
+
+{{occupancy_txt}} {{occupancy_label}}
+{{collected_txt}} {{collected_label}}
+{{rent_txt}} {{rent_label}}
+{{past_due_txt}} {{past_due_label}}
+
+YOUR {{home_word_upper}}
+{{homes_paragraph}}
+
+COMING UP
+{{coming_up}}
+
+WHAT WE'RE CHANGING
+{{company_block}}
+
+HOW YOU COMPARE
+{{how_you_compare}}
+Our verified profile: {{profile_url}}
+
+{{report_line}}
+
+{{closing_line}}
+{{referral_line}}
+
+{{company_name}} · {{company_phone}} · Numbers as of {{as_of}}. Verified-PM comparisons from PropertyManagement.com as of {{benchmarks_as_of}}. {{footer_note}}

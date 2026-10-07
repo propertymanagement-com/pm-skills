@@ -1,0 +1,7 @@
+dist/
+__pycache__/
+*.py[cod]
+*.zip
+client-config.local.json
+.pytest_cache/
+.venv/

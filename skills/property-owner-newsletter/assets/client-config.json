@@ -1,0 +1,122 @@
+{
+ "company": {
+  "name": "<company name>",
+  "short_name": "<short name>",
+  "website": "<company website>",
+  "phone": "<main phone>",
+  "pmcom_profile_url": "<PropertyManagement.com profile URL>",
+  "pmid": 999999,
+  "timezone": "America/Chicago",
+  "logo_url": "<logo URL>"
+ },
+ "brand": {
+  "primary": "#1368A1",
+  "accent": "#4B575E",
+  "tint": "#D8E2E8",
+  "font_display": "Georgia, 'Times New Roman', serif",
+  "font_body": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+  "_source": "[CONFIRM] Brand palette and fonts from the company's logo or style guide."
+ },
+ "sender": {
+  "from_name": "<company name>",
+  "reply_to": "<owners inbox@example.com>",
+  "_confirm": "Confirm the reply-to inbox the comms lead wants replies in."
+ },
+ "team": {
+  "managers": [],
+  "ops_lead": "<ops lead name>",
+  "comms_lead": "<comms lead name>",
+  "owner": "<company owner name>",
+  "_confirm": "Direct phones for every manager (all rows currently fall back to the main line)."
+ },
+ "regions": {
+  "core_cities": [],
+  "core_label": "<core market label>",
+  "other_label": "Suburbs"
+ },
+ "rent_gl_account": "4100",
+ "fees": {
+  "management_pct": 6,
+  "leasing_fee": "one month's rent",
+  "renewal_fee": "$299",
+  "_confirm": "Confirm before fees appear in owner copy."
+ },
+ "risk_weights": {
+  "management_ending": 50,
+  "owner_exit_moveout": 40,
+  "detractor": 40,
+  "owner_exit_note": 30,
+  "vacancy_60": 25,
+  "cost_sig_above": 25,
+  "vacancy_30": 15,
+  "passive": 15,
+  "cost_above": 15,
+  "expiring_no_renewal": 10,
+  "delinquency": 10,
+  "first_year": 10,
+  "statements_confusing": 10,
+  "voicemail": 10,
+  "promoter": -20,
+  "testimonial": -10,
+  "payments_on_hold": 15,
+  "no_owner_payment_90d": 10,
+  "turn_open_45d": 10,
+  "prior_tenant_loss": 10
+ },
+ "risk_tiers": {
+  "call": 50,
+  "watch": 25,
+  "call_cap_total": 10,
+  "call_cap_per_manager": 5
+ },
+ "newsletter": {
+  "cadence": "monthly",
+  "report_base_url": "https://REPLACE-ME.github.io/owner-reports/",
+  "referral_line": "Know another property owner in your market? Introductions are the best thanks we get.",
+  "company_block": "[CONFIRM] Two or three sentences on what changed this month.",
+  "recommendation_rules": [
+   {
+    "when": "lease ends within 90 days and rent is within 5% of market",
+    "stance": "Recommend renewing at the current rent."
+   },
+   {
+    "when": "lease ends within 90 days and rent is more than 5% below market",
+    "stance": "Propose an increase toward market, capped at 5% unless the company says otherwise."
+   },
+   {
+    "when": "lease ends within 90 days and rent is more than 5% above market",
+    "stance": "Recommend renewing flat; a turn would likely reprice down."
+   },
+   {
+    "when": "a unit has been vacant more than 30 days",
+    "stance": "Name the pricing or condition change being made to lease it."
+   },
+   {
+    "when": "a tenant balance exceeds one month of rent",
+    "stance": "State the collection step under way and the next date."
+   }
+  ],
+  "report_salt": "",
+  "max_increase_pct": 5,
+  "compare": {
+   "_note": "What the 'How you compare' section may cite. Collections and the owner survey always show when the data is loaded. Renewals show only when the company is within renewal_within_pct of the verified-PM median.",
+   "collections": true,
+   "survey": true,
+   "renewals": true,
+   "renewal_within_pct": 5,
+   "certifications": true
+  },
+  "certifications_to_feature": [],
+  "_certifications_note": "Pull certifications from the PM.com profile each quarter; delete the list to drop the sentence.",
+  "show_rent_vs_market": true,
+  "_show_rent_vs_market_note": "Market comparisons come from AppFolio's Computed Market Rent. Set false to hide every market comparison until the team trusts the field.",
+  "report_link": false,
+  "_report_link_note": "Set true once a host exists at report_base_url; the pages and the button come back."
+ },
+ "exclusions": {
+  "management_end_date_set": true,
+  "no_email": true
+ },
+ "watch_tags": [],
+ "_watch_tags_note": "Owner-directory Tags that mark a cohort worth a scripted touch. Counted in the radar's Patterns section, not scored per owner."
+}
