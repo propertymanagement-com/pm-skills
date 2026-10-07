@@ -150,7 +150,7 @@ def load_dir(d):
 def region_of(city, cfg):
     c = (city or "").strip().lower()
     if not c: return "Unknown"
-    core = [x.lower() for x in cfg.get("regions", {}).get("core_cities", ["Chicago"])]
+    core = [x.lower() for x in cfg.get("regions", {}).get("core_cities", [])]
     return cfg.get("regions", {}).get("core_label", "City") if c in core else cfg.get("regions", {}).get("other_label", "Suburbs")
 
 def build(reports, cfg, survey, as_of):

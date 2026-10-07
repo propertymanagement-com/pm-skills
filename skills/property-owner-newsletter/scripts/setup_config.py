@@ -19,7 +19,7 @@ import secrets
 import shutil
 import sys
 
-PLACEHOLDER = re.compile(r"\[CONFIRM|REPLACE-ME|CONFIRM\]|_confirm", re.I)
+PLACEHOLDER = re.compile(r"\[CONFIRM|REPLACE-ME|CONFIRM\]|_confirm|^<[^>]*>$", re.I)
 
 QUESTIONS = [
     ("Company", "company.short_name", "What do owners call you in a sentence (the short company name)?", "used in every email and talk track"),
