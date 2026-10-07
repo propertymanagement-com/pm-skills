@@ -6,7 +6,7 @@
   "phone": "<main phone>",
   "pmcom_profile_url": "<PropertyManagement.com profile URL>",
   "pmid": 999999,
-  "timezone": "America/Chicago",
+  "timezone": "<IANA timezone, e.g. America/New_York>",
   "logo_url": "<logo URL>"
  },
  "brand": {
