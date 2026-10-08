@@ -270,6 +270,33 @@ def build(reports, cfg, survey, as_of):
                                    "advertised_rent": num(uv.col(r, "Advertised Rent")), "last_move_out": to_dt(uv.col(r, "Last Move Out"))})
         zero_days = sum(1 for v in vac_by_prop.values() for u in v if u["days_vacant"] == 0)
         if zero_days: dq.append(f"Days Vacant reads 0 on {zero_days} vacant units (no move-out or available-on date recorded); vacancy age is understated there.")
+    # Vacancy age per rent-roll unit. The two reports label the same unit differently on single-unit properties (the rent roll often leaves Unit blank,
+    # Unit Vacancy Detail uses the street name), so a lookup by name alone misses and the age came back as None, which the page showed as 0 days.
+    def _nkey(x): return re.sub(r"[^a-z0-9]", "", re.sub(r"\b(unit|apt|apartment|suite|ste)\b", "", str(x or "").lower()))
+    def match_vacancy_row(p, u):
+        """The Unit Vacancy Detail row for a rent-roll unit: same name, else the same name ignoring 'Unit', '#' and spacing, else the property's only vacancy row."""
+        pv = vac_by_prop.get(p, [])
+        for v in pv:
+            if v.get("unit") == u["unit"]: return v
+        k = _nkey(u["unit"])
+        if k:
+            for v in pv:
+                if _nkey(v.get("unit")) == k: return v
+        return pv[0] if len(pv) == 1 else None
+    def vacancy_age(u, v):
+        """Days vacant: the report's figure when one is recorded, else days since the rent roll's Last Move Out, else None (unknown is never 0)."""
+        if v and v.get("days_vacant"): return v["days_vacant"]
+        if u.get("last_move_out"): return float((TODAY - u["last_move_out"]).days)
+        return None
+    def unit_vacancies(p):
+        """Every vacant rent-roll unit on the property (pre-leased ones included, as before) with its best-known age and readiness."""
+        out = []
+        for u in units_by_prop.get(p, []):
+            if not u["status"].startswith("Vacant"): continue
+            v = match_vacancy_row(p, u)
+            out.append({**(v or {}), "unit": u["unit"], "status": u["status"], "days_vacant": vacancy_age(u, v),
+                        "rent_ready": v["rent_ready"] if v else str(u.get("rent_ready", "")).strip().lower() in ("yes", "true", "1"), "posted": v["posted"] if v else False})
+        return out
     # --- work orders (turns / resident / internal)
     wo = reports.get("work_orders"); turns_by_prop = collections.defaultdict(list); wo_types = collections.Counter(); est_pairs = []
     if wo:
@@ -419,7 +446,7 @@ def build(reports, cfg, survey, as_of):
         if open_turns: add("turn_open_45d", 10, f"{len(open_turns)} turn work order(s) open more than 45 days (oldest {max((TODAY - t['created']).days for t in open_turns)} days)", "ops")
         loss = sum(legacy_by_prop.get(p, 0.0) for p in P)
         if loss > max(3000, rec["rent_month"] or 0): add("prior_tenant_loss", 10, f"Former tenants left ${loss:,.0f} unpaid on the owner's properties (more than a month of rent)", "ops")
-        vac = [u for p in P for u in vac_by_prop.get(p, [])]
+        vac = [u for p in P for u in unit_vacancies(p)]
         long_vac = [u for u in vac if u["days_vacant"] and u["days_vacant"] > 60]; mid_vac = [u for u in vac if u["days_vacant"] and 30 < u["days_vacant"] <= 60]
         if long_vac: add("vacancy_60", 25, f"{len(long_vac)} unit(s) vacant more than 60 days", "ops")
         elif mid_vac: add("vacancy_30", 15, f"{len(mid_vac)} unit(s) vacant more than 30 days", "ops")
@@ -457,12 +484,13 @@ def build(reports, cfg, survey, as_of):
         for p in P:
             pr = props.get(p, {}); pu = units_by_prop.get(p, []); pv = vac_by_prop.get(p, []); pe = live_expiring(p); cc = coll_by_prop.get(p)
             ppairs = [(u["rent"], u["market_rent"]) for u in pu if u["status"] in OCC and u["rent"] and u["market_rent"]]
-            vd = {u.get("unit"): u for u in pv}; ud = []
+            ud = []
             for u in pu:
-                st = u["status"]; v = vd.get(u["unit"]); kind = "vacant" if st.startswith("Vacant") else ("notice" if st.startswith("Notice") else "leased")
-                never = kind == "vacant" and st == "Vacant-Unrented" and u.get("last_move_out") is None and not (v and (v.get("days_vacant") or 0) > 0)
+                st = u["status"]; kind = "vacant" if st.startswith("Vacant") else ("notice" if st.startswith("Notice") else "leased")
+                v = match_vacancy_row(p, u) if kind == "vacant" else None; age = vacancy_age(u, v) if kind == "vacant" else None
+                never = kind == "vacant" and st == "Vacant-Unrented" and u.get("last_move_out") is None and not (age and age > 0)
                 ud.append({"unit": u["unit"], "status": kind, "pre_leased": st == "Vacant-Rented", "never_leased": never, "rent": u["rent"], "lease_end": u["lease_to"].date().isoformat() if u.get("lease_to") else None,
-                           "days_vacant": (v["days_vacant"] if v else None) if kind == "vacant" else None, "rent_ready": (v["rent_ready"] if v else None) if kind == "vacant" else None, "posted": (v["posted"] if v else None) if kind == "vacant" else None})
+                           "days_vacant": age, "rent_ready": ((v["rent_ready"] if v else str(u.get("rent_ready", "")).strip().lower() in ("yes", "true", "1")) if kind == "vacant" else None), "posted": ((v["posted"] if v else None) if kind == "vacant" else None)})
             # AppFolio buildings often carry floor-plan placeholder rows as units (never occupied, no move-out, 0 days vacant). On a building with tenants they are
             # not real vacancies and must not inflate the owner's unit count; on a building with nothing leased yet (lease-up) every unit is legitimately unleased, so keep them.
             leased_any = any(x["status"] != "vacant" for x in ud)
@@ -474,7 +502,7 @@ def build(reports, cfg, survey, as_of):
                                              "next_lease_end": min((x["expires"].date().isoformat() for x in pe), default=None), "lease_ends_120d": sorted(x["expires"].date().isoformat() for x in pe), "expiring_120d": len(pe),
                                              "m2m_units": sum(1 for un in m2m_units_by_prop.get(p, []) if un not in vacant_names_by_prop.get(p, set())),   # a month-to-month row on a vacant unit is a stale lease
                                              # vacancy figures come from the cleaned unit list (placeholders dropped), so the tile and the sentence always agree
-                                             "vacant_units": sum(1 for x in ud if x["status"] == "vacant"), "max_days_vacant": max((x["days_vacant"] or 0 for x in ud if x["status"] == "vacant"), default=None) if any(x["status"] == "vacant" for x in ud) else None,
+                                             "vacant_units": sum(1 for x in ud if x["status"] == "vacant"), "max_days_vacant": max((x["days_vacant"] for x in ud if x["status"] == "vacant" and x["days_vacant"] is not None), default=None),   # None = no vacancy or no recorded age; vacant_units says which
                                              "rent_ready": any(x.get("rent_ready") for x in ud if x["status"] == "vacant") if any(x["status"] == "vacant" for x in ud) else None, "lease_up": bool(ud) and all(x["status"] == "vacant" and x["never_leased"] for x in ud),
                                              "turns_12mo": len(turns_by_prop.get(p, [])), "turn_median_days": med([t["days"] for t in turns_by_prop.get(p, [])]),
                                              "collected_90d_pct": pct(cc[1], cc[0], 1) if cc and cc[0] else None, "charged_90d": round(cc[0]) if cc else None})

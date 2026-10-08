@@ -16,6 +16,7 @@ Call **`pm_skill_hello`** with `{ "skill": "property-owner-newsletter", "version
 
 ## Before anything: permissions and files
 
+- **Claude Team or Enterprise plans.** Custom connectors are added by a workspace admin (Settings, Connectors, Add custom connector, paste the URL from `company.mcp_connector_url`). Everyone else then hard-refreshes Claude before the connector shows up under their own Settings, Connectors; each person connects it with their own PM.com login, or the admin connects it once for the whole organization. When someone says they cannot see the connector, this is the first thing to check.
 - When the PropertyManagement.com connector is added, tell the person to choose **Allow always** (the connector is read-only). Otherwise every run re-asks, and a nervous "don't allow" stops the skill mid-way.
 - Keep the export folder inside the Claude workspace (a Project, or files added to the conversation) rather than on the desktop, so Claude is not asking for desktop access during the run. When a file prompt still appears, say in one line what it is for and which button to press.
 - Never show raw JSON or script output in the reply. Scripts print one plain line and write their detail to files; read the files.
@@ -58,8 +59,10 @@ If `setup_needed` is true (no `setup.completed_at`, or placeholders still open),
 
 0. If the PropertyManagement.com connector is connected, call **`pm_org_get`**, save the JSON, and run `python3 scripts/setup_config.py seed --config <exports>/client-config.json --org-json <exports>/org.json` before the checklist. If the connector is missing, skip seeding and ask during the checklist.
 1. Print the checklist (`setup_config.py checklist --config ...`) and ask **in one message**, grouped the way the checklist groups them (company, team and direct phones, brand, regions, newsletter host and lines, certifications, fees, risk thresholds), showing the current value for each so the person only has to correct what is wrong. Offer the defaults. Accept partial answers; whatever is not answered stays open and gets asked again next month, it never blocks the run.
+   Brand means three things, and the member's output must carry theirs, never the PropertyManagement.com defaults: the **logo** (a hosted image URL for the email header, usually the one on their website; a file for the offline dashboard, embedded with `setup_config.py logo --config <exports>/client-config.json --file <logo>`), the **colours** (primary and accent, hex) and the **fonts** (display and body). When they have no brand kit, read these off their website before asking: the logo from the header image, the primary colour from buttons and the active nav item, the accent from icon highlights, the fonts from the stylesheet's `font-family` or its Google Fonts link. Show what you found and let them correct it.
+
 2. Write the answers with `setup_config.py apply --config <exports>/client-config.json --answers answers.json` (or `--set path=value` for one or two fields) and `--by <name>`. It stamps `setup.completed_at` and reports what is still open.
-3. Check the connector once: call `pm_ping`, `pm_truematch_survey_overview`, and **`pm_benchmarks_get`**. Write survey to `<exports>/survey.json` and benchmarks to `<exports>/benchmarks.json`. If the connector is not present, say so in one line and continue; the survey sentence and benchmark sentences are left out until it is added (Settings → Connectors → Add custom connector → paste the org URL from the PM.com Client Dashboard MCP page: `https://mcp.propertymanagement.com/api/mcp/v1/orgs/<org-id>`).
+3. Check the connector once: call `pm_ping`, `pm_truematch_survey_overview`, and **`pm_benchmarks_get`**. Write survey to `<exports>/survey.json` and benchmarks to `<exports>/benchmarks.json`. If the connector is not present, say so in one line and continue; the survey sentence and benchmark sentences are left out until it is added (Settings → Connectors → Add custom connector → paste the org URL from the PM.com Client Dashboard MCP page: `https://mcp.propertymanagement.com/api/mcp/v1/orgs/<org-id>`). Also call `pm_org_get` and confirm the organization name matches `company.name` in the config; a connector signed into a different company must not write this member's `survey.json`. If the connector is absent, quote the member's exact URL from `company.mcp_connector_url` when you say so.
 4. Then inventory the exports (next section). On the very first run the person often has none yet: give them the export list for this skill with the steps from `references/appfolio-exports.md`, and stop until the folder is filled.
 
 From then on every command takes `--config <exports>/client-config.json`. Anything the person changes later (a new manager, a new phone, this month's company update) goes through `setup_config.py apply` so the file stays valid.
@@ -84,7 +87,7 @@ If a required report is missing or older than 45 days, stop and ask the user for
 
 ### 3. Pull the survey results
 
-Use the PropertyManagement.com connector as described in `references/pmcom-connector.md`: overview, then list responses, then each response, written to `<exports>/survey.json`. If the connector is not available, say so and continue without it.
+Use the PropertyManagement.com connector as described in `references/pmcom-connector.md`: overview, then list responses, then each response, written to `<exports>/survey.json`. If the connector is not available, say so and continue without it. Two guards from that reference: if `pm_org_get` names a different company than the config, or the pull returns nothing, keep the `survey.json` already in the folder and say so; never overwrite a good file with an empty one.
 
 ### 4. Compute the features
 

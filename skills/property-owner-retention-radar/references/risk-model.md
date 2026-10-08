@@ -59,3 +59,9 @@ Refinements from early runs:
 - **Open turns** on a unit that has a tenant who moved in after the work order was opened do not count.
 - **Former tenant left a balance** uses a bar of $3,000 or one month of the owner's rent, whichever is higher, so a large building rarely fires it; that is deliberate, the loss has to matter at the owner's scale.
 - `watch_tags` matching is a plain substring; make it specific (for example a year-specific waiver tag, not a generic "Fee Waived" that also catches earlier years).
+
+## Vacancy age and the long-vacancy flag (2026-10-07)
+
+Days vacant per unit comes from the Unit Vacancy Detail report matched to the rent-roll unit: same unit name, else the same name ignoring "Unit", "#" and spacing, else the property's only vacancy row. When the report carries no age (it reads 0 when no move-out or available-on date is recorded), the age is days since the rent roll's Last Move Out; when that is missing too the age is unknown and the page says so, never 0. On single-unit properties the two reports label the unit differently, which is why the old name-only lookup showed owners with real vacancies as "0 d" and dropped them out of the week's five. Scoring (`vacancy_30`, `vacancy_60`) counts the same units it always did.
+
+A vacancy at or past `risk_tiers.long_vacancy_flag_days` (default 100) stops being the lever for the play. Past that point there is almost always a reason the team already knows (a renovation, an owner holding the unit, a sale in progress), so a call about the leasing plan lands wrong. The owner keeps their score and their place in the survey table if they answered; the likely-detractor table and the week's five leave them out, and if nothing else is actionable they appear in the Flags section at the bottom with a note to confirm the reason is on file.

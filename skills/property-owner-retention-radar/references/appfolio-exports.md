@@ -4,7 +4,7 @@ Export every report as **Excel (.xlsx) or CSV, never PDF**, with all columns sel
 
 | Report (AppFolio > Reporting) | Settings | Used for | Needed for |
 |---|---|---|---|
-| **Owner Directory** | Customize, select all columns, export | Owner to properties join (`Owner ID`, `Properties Owned IDs`, `Email`, `First Name`) | Both skills |
+| **Owner Directory** | Owners: All and Properties: All (include inactive, so owners who left still count as departures), Customize, select all columns, export | Owner to properties join (`Owner ID`, `Properties Owned IDs`, `Email`, `First Name`) | Both skills |
 | **Property Directory** | Properties: All (include inactive), select all columns | Property type, city/zip, `Site Manager Name` (the property manager), `Management Start/End Date`, `Owner ID(s)` | Both skills |
 | **Rent Roll** | As of: today. Units: All. Include Non-Revenue Units: No. Select all columns (needs `Property ID`, `Unit ID`, `Status`, `Rent`, `Computed Market Rent`, `Past Due`, `Last Move Out`) | Occupancy, rent vs market, past due, never-leased units | Both skills |
 | **Tenant Tickler** | Events: Move-in, Move-out, Notice. Occurred Range: last 6 months to today. Properties: All | Departures, `Move Out Reason` (owner-initiated exits), `Assigned User` | Sharpens |

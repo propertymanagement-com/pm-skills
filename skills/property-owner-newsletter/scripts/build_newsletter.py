@@ -301,6 +301,7 @@ def build_rows(company, owners, cfg, month, base_url, salt):
                "company_name": co.get("name", ""), "company_phone": co.get("phone", ""), "logo_url": co.get("logo_url", ""),
                "brand_primary": cfg.get("brand", {}).get("primary", "#0B2545"), "brand_accent": cfg.get("brand", {}).get("accent", "#4A5568"),
                "font_display": cfg.get("brand", {}).get("font_display", "Georgia, serif"), "font_body": cfg.get("brand", {}).get("font_body", "Helvetica Neue, Arial, sans-serif"),
+               "font_link": (f'<link rel="stylesheet" href="{cfg.get("brand", {}).get("font_link")}">' if cfg.get("brand", {}).get("font_link") else ""),
                "as_of": as_of, "benchmarks_as_of": BENCH.get("as_of") if BENCH_OK else "", "footer_note": "You receive this because we manage property for you.",
                "_needs_confirm": "[CONFIRM" in coming, "_radar_tier": o["tier"], "_properties": P, "_collected": collected, "_company_collections": C,
                "_survey_band": ("promoter" if (o.get("survey") or {}).get("nps", 0) >= 9 else "detractor" if (o.get("survey") or {}).get("nps", 10) <= 6 else "passive") if o.get("survey") else "no survey"}

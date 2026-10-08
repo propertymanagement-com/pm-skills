@@ -37,7 +37,8 @@ def unit_status(u):
     if u["status"] == "leased": return "leased" + (f", ends {u['lease_end']}" if u.get("lease_end") else ""), "leased"
     if u["status"] == "notice": return "notice given", "notice"
     if u.get("pre_leased"): return "pre-leased", "pre"
-    d = u.get("days_vacant") or 0
+    d = u.get("days_vacant")
+    if d is None: return "vacant, age not recorded", "vac"
     return (f"vacant {d:.0f} d" if d else "between tenants"), ("v60" if d > 60 else "v30" if d > 30 else "vac")
 
 def chips(P):
@@ -49,7 +50,8 @@ def where(pd): return pd.get("address") or f'{(pd.get("type") or "property").low
 def vacancy_now(o):
     vac = [(pd, u) for pd in o["properties_detail"] for u in pd.get("units_detail", []) if u["status"] == "vacant" and not u.get("pre_leased")]
     if not vac: return None
-    days = max((u.get("days_vacant") or 0) for _, u in vac); worst = max(vac, key=lambda x: x[1].get("days_vacant") or 0)
+    known = [(pd, u) for pd, u in vac if u.get("days_vacant") is not None]   # an unrecorded age is None, never 0
+    days = max(u["days_vacant"] for _, u in known) if known else None; worst = max(known, key=lambda x: x[1]["days_vacant"]) if known else vac[0]
     return {"count": len(vac), "days": days, "address": where(worst[0]), "unit": worst[1]["unit"], "rent_ready": any(u.get("rent_ready") for _, u in vac), "posted": any(u.get("posted") for _, u in vac), "lease_up": all(u.get("never_leased") for _, u in vac)}
 
 def next_renewal(o, today):
@@ -67,6 +69,9 @@ def market_phrase(rvm):
     if abs(rvm) < 5: return "rent in line with market"
     return f"rent {abs(rvm):.0f}% {'above' if rvm > 0 else 'below'} market"
 
+def fmt_days(d): return "vacancy age not recorded" if d is None else f"{d:.0f} days"
+def fmt_d(d): return "age unknown" if d is None else f"{d:.0f} d"
+
 def band(o):
     s = o.get("survey") or {}; n = s.get("nps")
     if not isinstance(n, (int, float)): return None
@@ -78,7 +83,7 @@ def the_play(b, vac, ren, mgr_short):
     """One sentence the manager can act on. Order: vacancy today beats everything; then the renewal; then hold."""
     if vac:
         if vac["lease_up"]: return f"Lease-up: {vac['count']} unit{'s' if vac['count'] > 1 else ''} never leased. Send the first-showing report this week; the owner has no income yet."
-        lead = f"Vacant today ({vac['days']:.0f} days at {vac['address']}" + (f", {vac['count']} units" if vac["count"] > 1 else "") + ")."
+        lead = f"Vacant today ({fmt_days(vac['days'])} at {vac['address']}" + (f", {vac['count']} units" if vac["count"] > 1 else "") + ")."
         tail = " Talk this week with the leasing plan and a lease-by date" + ("; it is rent-ready but not posted, post it first." if vac["rent_ready"] and not vac["posted"] else ".")
         return lead + tail
     if ren:
@@ -96,7 +101,7 @@ def priority(b, pred, vac, ren):
 # ------------------------------------------------------------------ page
 CSS = """
 :root{--pri:%(primary)s;--acc:%(accent)s;--ink:#111827;--muted:#6B7280;--line:#E5E7EB;--bg:#F4F5F8;--red:#B42318;--amber:#B54708;--green:#067647}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif}.wrap{max-width:1180px;margin:0 auto;padding:0 20px 70px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 %(font_body)s}.wrap{max-width:1180px;margin:0 auto;padding:0 20px 70px}
 .top{background:var(--pri);color:#fff;padding:22px 0 24px}.top h1{margin:6px 0 4px;font-size:26px;letter-spacing:-.01em}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75);font-weight:700}.top p{margin:0;color:#D1D5DB;max-width:860px}
 .ctrl{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:10px 0}.ctrl .wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-bottom:0}
 .pill{background:#F4F5F8;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;color:#374151;cursor:pointer}.pill.on{background:var(--pri);color:#fff;border-color:var(--pri)}.pill b{font-weight:800}
@@ -111,6 +116,9 @@ table.tbl{width:100%;border-collapse:collapse;background:#fff;border-radius:12px
 .vac{color:var(--red);font-weight:700}.ok{color:var(--green);font-weight:700}.ren b{font-weight:800}.score{display:inline-block;min-width:26px;text-align:center;border-radius:6px;padding:1px 6px;font-weight:800;font-size:12px;background:#FEE4E2;color:var(--red)}.score.p{background:#D1FADF;color:var(--green)}.score.m{background:#F2F4F7;color:#475467}
 .hide{display:none}.empty{color:var(--muted)}.foot{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}.banner{background:#FFF3D6;border-left:4px solid var(--acc);padding:10px 14px;border-radius:0 10px 10px 0;margin:14px 0;font-size:13.5px}
 details{margin-top:8px}details summary{cursor:pointer;font-weight:700;font-size:13px;color:#374151}ul.plain{margin:6px 0 0;padding-left:18px;font-size:13.5px}
+.top .wrap{padding-bottom:0;display:flex;justify-content:space-between;align-items:flex-start;gap:24px}.top .wrap>div:first-child{min-width:0}.logo-plate{background:#fff;border-radius:12px;padding:10px 14px;flex:0 0 auto;margin-top:4px}.logo-plate img{height:54px;display:block}
+h1,h2,h4,.big{font-family:%(font_display)s}
+.pill .pd{display:block;font-size:10.5px;font-weight:500;line-height:1.1;opacity:.75}.pill.none{opacity:.7}
 body.owner .detail{display:none}body.owner .five{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}body.owner .f .play{font-size:15px}
 @media print{.ctrl{display:none}table.tbl,.f,.card{break-inside:avoid}}
 """
@@ -138,8 +146,12 @@ def main():
     company = json.load(open(os.path.join(O, "company.json"))); owners = json.load(open(os.path.join(O, "owners.json"))); inv = json.load(open(os.path.join(O, "inventory.json")))
     dq = open(os.path.join(O, "data-quality.md")).read() if os.path.exists(os.path.join(O, "data-quality.md")) else ""
     cfg = json.load(open(a.config)) if a.config else {}; co = cfg.get("company", {}); brand = cfg.get("brand", {}); thr = cfg.get("risk_tiers", {"call": 50, "watch": 25})
+    FLAG_DAYS = int(thr.get("long_vacancy_flag_days", 100))   # a vacancy this old is a situation, not this week's work; config risk_tiers.long_vacancy_flag_days
     prev = json.load(open(a.previous)) if a.previous and os.path.exists(a.previous) else None
     primary = brand.get("primary", "#0B2545"); accent = brand.get("accent", "#4A5568"); short = co.get("short_name", "the company")
+    font_body = brand.get("font_body") or "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"; font_display = brand.get("font_display") or font_body
+    logo_src = brand.get("logo_data_uri") or brand.get("logo_url") or co.get("logo_url") or ""   # the member's logo on a white plate; an embedded data URI keeps the page offline
+    logo_html = f'<div class="logo-plate"><img src="{e(logo_src)}" alt="{e(co.get("name", ""))}"></div>' if logo_src else ""
     as_of = inv.get("as_of", ""); today = dt.date.fromisoformat(as_of[:10]) if as_of else dt.date.today(); missing = [m for m in inv.get("missing", []) if m != "unit_directory"]
     P, R, V, S, C, D, DQ = company.get("portfolio", {}), company.get("renewals", {}), company.get("vacancy", {}), company.get("survey", {}) or {}, company.get("collections", {}), company.get("departures", {}), company.get("delinquency", {})
     certs = (cfg.get("newsletter", {}) or {}).get("certifications_to_feature", []) or []
@@ -150,11 +162,18 @@ def main():
         b = band(o); osc = ops_score(o); pred = b is None and osc >= thr.get("watch", 25)
         vac = vacancy_now(o); ren = next_renewal(o, today); m = (o["managers"] or ["Unassigned"])[0]
         why = "; ".join(SIGNAL_LABEL.get(s.get("key"), s["signal"]) for s in o["signals"] if s.get("type") == "ops" and s["points"] > 0)[:160]
-        recs.append({"o": o, "band": b, "pred": pred, "ops": osc, "vac": vac, "ren": ren, "mgr": m, "why": why, "play": the_play(b, vac, ren, m), "pri": priority(b, pred, vac, ren),
+        # Past the flag threshold a vacancy is a situation with a reason behind it (renovation, owner hold, a sale in progress), not this week's work:
+        # it stops being the lever for the play, and an owner with nothing else to act on moves to the flags at the bottom of the page.
+        long_vac = bool(vac and vac["days"] is not None and vac["days"] >= FLAG_DAYS); vac_act = None if long_vac else vac
+        play = the_play(b, vac_act, ren, m) + (f" Long-standing vacancy ({vac['days']:.0f} d at {vac['address']}) is in the flags below; confirm the reason is on file." if long_vac else "")
+        pri = priority(b, pred, vac_act, ren); flag = long_vac and b != "detractor" and not ren
+        if flag: pri = 7
+        recs.append({"o": o, "band": b, "pred": pred, "ops": osc, "vac": vac, "ren": ren, "mgr": m, "why": why, "play": play, "pri": pri, "flag": flag, "long_vac": long_vac,
                      "name": o.get("display_name") or o["name"], "nps": (o.get("survey") or {}).get("nps")})
-    def sort_key(r): return (r["pri"], -(r["vac"]["days"] if r["vac"] else 0), r["ren"]["date"].toordinal() if r["ren"] else 10**9, -(r["ops"]))
+    def sort_key(r): return (r["pri"], -((r["vac"]["days"] or 0) if r["vac"] else 0), r["ren"]["date"].toordinal() if r["ren"] else 10**9, -(r["ops"]))
     recs.sort(key=sort_key)
-    surveyed = [r for r in recs if r["band"]]; predictive = [r for r in recs if r["pred"]]
+    surveyed = [r for r in recs if r["band"]]; predictive = [r for r in recs if r["pred"] and not r["flag"]]
+    flags = sorted([r for r in recs if r["flag"]], key=lambda r: -(r["vac"]["days"] or 0))
     five = [r for r in recs if r["pri"] <= 5][:5]
     # ---------- survey + benchmark strip
     bench_nps = f' · verified PMs +{BENCH["nps_all"]}, median PM +{BENCH["nps_median_pm"]}' if bench_ok and BENCH.get("nps_all") is not None else ""
@@ -185,18 +204,39 @@ def main():
     # ---------- tables
     def tr(r, t):
         o = r["o"]; vac = r["vac"]; ren = r["ren"]
-        vac_td = (f'<span class="vac">{vac["count"]} vacant · {vac["days"]:.0f} d</span><div class="sub">{e(vac["address"])}{"" if vac["posted"] else " · not posted" if vac["rent_ready"] else " · not rent-ready"}</div>') if vac else '<span class="ok">All leased</span>'
+        vac_attr = f"{vac['count']} vacant, {fmt_d(vac['days'])}" if vac else ""
+        vac_td = (f'<span class="vac">{vac["count"]} vacant · {fmt_d(vac["days"])}</span><div class="sub">{e(vac["address"])}{"" if vac["posted"] else " · not posted" if vac["rent_ready"] else " · not rent-ready"}</div>') if vac else '<span class="ok">All leased</span>'
         ren_td = (f'<span class="ren"><b>{ren["date"].strftime("%b %d").replace(" 0", " ")}</b></span><div class="sub">{e(ren["address"])}{(" · " + e(ren["unit"])) if ren["multi"] else ""} · {e(market_phrase(ren["rvm"]))}</div>') if ren else '<span class="sub">none inside 90 days</span>'
         sc = (f'<span class="score {"p" if r["band"] == "promoter" else "m" if r["band"] == "passive" else ""}">{r["nps"]:.0f}</span>' if isinstance(r["nps"], (int, float)) else f'<span class="score m" title="pattern score">{r["ops"]}</span>')
         why = f'<div class="sub">{e(r["why"])}</div>' if (t == "predictive" and r["why"]) else ""
-        return (f'<tr data-t="{t}" data-mgr="{e(r["mgr"])}" data-band="{e(r["band"] or "")}" data-name="{e(r["name"])}" data-survey="{r["nps"] if r["nps"] is not None else ""}" data-units="{o["units"]}" data-vac="{e(f"{vac[chr(99)+chr(111)+chr(117)+chr(110)+chr(116)]} vacant, {vac[chr(100)+chr(97)+chr(121)+chr(115)]:.0f} d" if vac else "")}" data-ren="{e(ren["date"].isoformat() + " " + ren["address"] if ren else "")}" data-play="{e(r["play"])}" data-q="{e((r["name"] + " " + r["mgr"] + " " + " ".join(where(pd) for pd in o["properties_detail"])).lower())}">'
+        return (f'<tr data-t="{t}" data-mgr="{e(r["mgr"])}" data-band="{e(r["band"] or "")}" data-name="{e(r["name"])}" data-survey="{r["nps"] if r["nps"] is not None else ""}" data-units="{o["units"]}" data-vac="{e(vac_attr)}" data-ren="{e(ren["date"].isoformat() + " " + ren["address"] if ren else "")}" data-play="{e(r["play"])}" data-q="{e((r["name"] + " " + r["mgr"] + " " + " ".join(where(pd) for pd in o["properties_detail"])).lower())}">'
                 f'<td class="nm"><b>{e(r["name"])}</b><div class="sub">{o["properties"]} propert{"y" if o["properties"] == 1 else "ies"} · {o["units"]} units · {fmt_money(o["rent_month"])}/mo</div><div class="chips">{chips(o["properties_detail"])}</div></td>'
                 f'<td>{e(r["mgr"])}</td><td>{sc}{why}</td><td>{vac_td}</td><td>{ren_td}</td><td>{e(r["play"])}</td></tr>')
     t1 = "".join(tr(r, "survey") for r in surveyed); t2 = "".join(tr(r, "predictive") for r in predictive)
     head = '<thead><tr><th>Owner</th><th>Manager</th><th>Score</th><th>Today</th><th>Next renewal (90 d)</th><th>The play</th></tr></thead>'
     counts = collections.Counter(r["band"] for r in surveyed)
-    mgr_names = [m for m, _ in collections.Counter(r["mgr"] for r in recs if r["pri"] <= 5).most_common()]
-    mgr_pills = "".join(f'<button class="pill" data-mgr="{e(m)}">{e(m)} <b>{sum(1 for r in five if r["mgr"] == m)}</b></button>' for m in mgr_names)
+    cfg_mgrs = [m.get("first_name") for m in (cfg.get("team", {}) or {}).get("managers", []) if m.get("first_name")]
+    doors = collections.Counter(); owners_by_mgr = collections.Counter()
+    for o in live:
+        seen = set()
+        for pd in o["properties_detail"]:
+            mg = pd.get("manager") or "Unassigned"; doors[mg] += pd.get("units", 0); seen.add(mg)
+        for mg in seen: owners_by_mgr[mg] += 1
+    mgr_names = list(dict.fromkeys(cfg_mgrs + [m for m, _ in doors.most_common() if m != "Unassigned"] + (["Unassigned"] if doors.get("Unassigned") else [])))
+    mgr_rows = [{"name": m, "doors": doors.get(m, 0), "owners": owners_by_mgr.get(m, 0), "listed": sum(1 for r in recs if r["mgr"] == m and r["pri"] <= 5), "five": sum(1 for r in five if r["mgr"] == m), "flags": sum(1 for r in flags if r["mgr"] == m)} for m in mgr_names]
+    def pill(m):   # a manager with no doors still shows: as the ops lead you want to know nobody's properties carry that name in the Site Manager field
+        if not m["doors"]: return f'<button class="pill none" data-mgr="{e(m["name"])}" title="No property carries this name in the Site Manager field">{e(m["name"])} <b>0</b><span class="pd">no doors assigned</span></button>'
+        return f'<button class="pill" data-mgr="{e(m["name"])}" title="{m["owners"]} owners · {m["doors"]} doors · {m["listed"]} on the list · {m["flags"]} flagged">{e(m["name"])} <b>{m["listed"]}</b><span class="pd">{m["doors"]} door{"s" if m["doors"] != 1 else ""} · {m["owners"]} owner{"s" if m["owners"] != 1 else ""}</span></button>'
+    mgr_pills = "".join(pill(m) for m in mgr_rows)
+    # ---------- flags: long-standing vacancies, no action this week
+    def flag_note(r): return f'{"Likely detractor by pattern, " if r["pred"] else ""}vacant past {FLAG_DAYS} days ({r["vac"]["days"]:.0f} d at {r["vac"]["address"]}). Usually a known situation (renovation, owner hold, a sale in progress). No call this week; confirm the reason is on file and that the listing status is right.'
+    def flag_tr(r):
+        v = r["vac"]
+        return (f'<tr data-t="flag" data-mgr="{e(r["mgr"])}" data-name="{e(r["name"])}"><td class="nm"><b>{e(r["name"])}</b><div class="sub">{r["o"]["properties"]} propert{"y" if r["o"]["properties"] == 1 else "ies"} · {r["o"]["units"]} units</div></td><td>{e(r["mgr"])}</td>'
+                f'<td><span class="vac">{v["count"]} vacant · {v["days"]:.0f} d</span><div class="sub">{e(v["address"])}{"" if v["posted"] else " · not posted" if v["rent_ready"] else " · not rent-ready"}</div></td>'
+                f'<td>{e(flag_note(r))}</td></tr>')
+    flags_html = (f'<section class="detail"><h2>Flags<span class="meta">vacancies of {FLAG_DAYS}+ days, pulled out of the lists above: <span class="cnt" data-t="flag">{len(flags)}</span> owners, no action needed this week</span></h2>'
+                  f'<table class="tbl"><thead><tr><th>Owner</th><th>Manager</th><th>Vacancy</th><th>Why it is here</th></tr></thead><tbody>{"".join(flag_tr(r) for r in flags)}</tbody></table></section>') if flags else ""
     # ---------- movers, patterns, data quality
     mv_html = ""
     if prev:
@@ -212,8 +252,8 @@ def main():
     pat_html = "".join(f"<li>{p}</li>" for p in pat)
     miss_html = "".join(f"<li><b>{e(m.replace('_', ' '))}</b> not uploaded (see appfolio-exports.md).</li>" for m in missing); dq_html = "".join(f"<li>{e(l[2:])}</li>" for l in dq.splitlines() if l.startswith("- "))
     banner = f'<div class="banner"><b>Gaps in this run:</b> {", ".join(m.replace("_", " ") for m in missing)} not uploaded.</div>' if missing else ""
-    html_out = f"""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{e(a.title)} · {e(co.get('name', ''))}</title><style>{CSS.replace('%(primary)s', primary).replace('%(accent)s', accent)}</style></head><body data-asof="{e(as_of)}">
-<header class="top"><div class="wrap"><div class="eyebrow">Internal · {e(co.get('name', ''))} · data as of {e(as_of)}</div><h1>{e(a.title)}</h1><p>The renewal play: find the owners who are unhappy or about to be, pair each with what is happening on their property, and reach them with a win in hand. This page surfaces the work; your team does it in its normal tools. Survey answers stay inside the company.</p></div></header>
+    html_out = f"""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{e(a.title)} · {e(co.get('name', ''))}</title><style>{CSS.replace('%(primary)s', primary).replace('%(accent)s', accent).replace('%(font_body)s', font_body).replace('%(font_display)s', font_display)}</style></head><body data-asof="{e(as_of)}">
+<header class="top"><div class="wrap"><div><div class="eyebrow">Internal · {e(co.get('name', ''))} · data as of {e(as_of)}</div><h1>{e(a.title)}</h1><p>The renewal play: find the owners who are unhappy or about to be, pair each with what is happening on their property, and reach them with a win in hand. This page surfaces the work; your team does it in its normal tools. Survey answers stay inside the company.</p></div>{logo_html}</div></header>
 <div class="ctrl"><div class="wrap"><button class="pill on" data-mgr="all">All managers</button>{mgr_pills}<span style="width:8px"></span><input id="q" type="search" placeholder="Search owner, address, manager"><span class="sp"></span><button class="btn" id="ownerview">Owner view</button><button class="btn p" id="csv">Export list</button></div></div>
 <main class="wrap"><div class="strip">{nps_html}{bench_html}</div>{banner}
 <h2>This week's five<span class="meta">detractors with a vacancy today first, then detractors with a renewal inside 90 days, then likely detractors with the same; nothing on this list is a courtesy call</span></h2><div class="five">{five_html}</div>
@@ -223,6 +263,7 @@ def main():
 <section class="detail"><h2>Likely detractors<span class="meta">no survey answer, but the data looks like the detractors': <span class="cnt" data-t="predictive">{len(predictive)}</span> owners, pattern score {thr.get("watch", 25)}+</span></h2>
 {f'<table class="tbl">{head}<tbody>{t2}</tbody></table>' if t2 else '<p class="empty">Nobody without a survey answer crosses the pattern threshold.</p>'}
 <p class="sub" style="margin-top:8px">Pattern-based for now (owner-initiated move-outs, long vacancies, payments on hold, failed tenancies, cost signals). It gets calibrated against each new survey cycle.</p></section>
+{flags_html}
 {mv_html}
 <section class="detail"><h2>Patterns</h2><div class="card"><ul class="plain">{pat_html}</ul></div>
 <details><summary>Data quality and gaps</summary><ul class="plain">{miss_html}{dq_html}</ul></details></section>
@@ -232,14 +273,14 @@ def main():
     with open(os.path.join(O, "call-list.csv"), "w", newline="") as f:
         w = csv.writer(f); w.writerow(["table", "priority", "owner", "manager", "survey_score", "pattern_score", "properties", "units", "vacant_today", "next_renewal", "play", "email"])
         for r in recs:
-            if r["pri"] > 5: continue
-            w.writerow(["survey" if r["band"] else "predictive", r["pri"], r["name"], r["mgr"], r["nps"] if r["nps"] is not None else "", r["ops"], r["o"]["properties"], r["o"]["units"], f'{r["vac"]["count"]} vacant, {r["vac"]["days"]:.0f} d at {r["vac"]["address"]}' if r["vac"] else "", f'{r["ren"]["date"].isoformat()} {r["ren"]["address"]}' if r["ren"] else "", r["play"], (r["o"]["emails"] or [""])[0]])
+            if r["pri"] > 5 and not r["flag"]: continue
+            w.writerow(["flag" if r["flag"] else "survey" if r["band"] else "predictive", r["pri"], r["name"], r["mgr"], r["nps"] if r["nps"] is not None else "", r["ops"], r["o"]["properties"], r["o"]["units"], f'{r["vac"]["count"]} vacant, {fmt_d(r["vac"]["days"])} at {r["vac"]["address"]}' if r["vac"] else "", f'{r["ren"]["date"].isoformat()} {r["ren"]["address"]}' if r["ren"] else "", flag_note(r) if r["flag"] else r["play"], (r["o"]["emails"] or [""])[0]])
     json.dump([{"owner_id": r["o"]["owner_id"], "name": r["name"], "listed": r["pri"] <= 5, "priority": r["pri"], "band": r["band"], "pattern_score": r["ops"], "as_of": as_of} for r in recs], open(os.path.join(O, "radar-run.json"), "w"), indent=1)
     summary = {"as_of": as_of, "five": [{"owner": r["name"], "manager": r["mgr"], "why": ("detractor" if r["band"] == "detractor" else "likely detractor"), "play": r["play"]} for r in five],
                "survey": {"detractors": counts.get("detractor", 0), "passives": counts.get("passive", 0), "promoters": counts.get("promoter", 0), "nps": S.get("nps"), "responses": S.get("responses")},
-               "predictive": len(predictive), "five_per_manager": dict(collections.Counter(r["mgr"] for r in five)), "listed": sum(1 for r in recs if r["pri"] <= 5), "per_manager": dict(collections.Counter(r["mgr"] for r in recs if r["pri"] <= 5)), "html": os.path.join(O, "radar-dashboard.html"), "csv": os.path.join(O, "call-list.csv")}
+               "predictive": len(predictive), "flags": len(flags), "flag_days": FLAG_DAYS, "managers": mgr_rows, "five_per_manager": dict(collections.Counter(r["mgr"] for r in five)), "listed": sum(1 for r in recs if r["pri"] <= 5), "per_manager": dict(collections.Counter(r["mgr"] for r in recs if r["pri"] <= 5)), "html": os.path.join(O, "radar-dashboard.html"), "csv": os.path.join(O, "call-list.csv")}
     json.dump(summary, open(os.path.join(O, "radar-summary.json"), "w"), indent=1)
     if a.json: print(json.dumps(summary, indent=1))
-    else: print(f"Radar built: this week's {len(five)} ({', '.join(f'{m} {n}' for m, n in summary['five_per_manager'].items())}); on the list {summary['listed']} ({counts.get('detractor', 0)} survey detractors, {len(predictive)} likely detractors). Open {summary['html']}")
+    else: print(f"Radar built: this week's {len(five)} ({', '.join(f'{m} {n}' for m, n in summary['five_per_manager'].items())}); on the list {summary['listed']} ({counts.get('detractor', 0)} survey detractors, {len(predictive)} likely detractors); {len(flags)} flagged for long vacancies. Open {summary['html']}")
 
 if __name__ == "__main__": main()

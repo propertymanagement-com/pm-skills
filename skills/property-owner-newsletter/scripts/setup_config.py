@@ -26,7 +26,9 @@ QUESTIONS = [
     ("Company", "company.phone", "Main phone number owners should call?", "the closing line of every email falls back to it"),
     ("Company", "company.pmcom_profile_url", "Your PropertyManagement.com profile URL?", "the 'See our verified profile' link"),
     ("Team", "team.managers", "Your property managers: first name as it appears in AppFolio's Site Manager field, full name, direct phone (one line each)?", "owners are routed to their manager; the closing line uses the direct phone"),
-    ("Brand", "brand.primary", "Brand primary colour (hex), accent colour (hex), display font, body font, and a logo URL?", "the emails, the report pages and the dashboard use them"),
+    ("Brand", "brand.logo_url", "Your logo: a hosted image URL for the email header (the logo on your website works), and a logo file for the dashboard if you have one (we embed it with `setup_config.py logo --file`)?", "the email header tile and the dashboard header"),
+    ("Brand", "brand.primary", "Brand colours: primary (hex) and accent (hex)? No brand kit: we read them off your website's buttons and highlights and you confirm.", "every heading, button and bar in the emails and the dashboard"),
+    ("Brand", "brand.font_display", "Fonts: display (headings) and body? Google Fonts names are fine; email clients that ignore web fonts fall back to the system font you name after it.", "headings and body text in the emails and the dashboard"),
     ("Regions", "regions.core_cities", "Which cities count as your core market (the rest are 'suburbs')?", "renewals and departures are sliced by region"),
     ("Newsletter", "newsletter.report_base_url", "Where will the per-owner report pages be hosted (a URL ending in /)?", "the 'See your portfolio report' button links there"),
     ("Newsletter", "newsletter.referral_line", "One soft referral line for the end of the owner email (or keep the default)?", "the only ask in the email"),
@@ -112,7 +114,7 @@ def open_items(cfg):
                 walk(v, f"{path}.{i}")
         elif isinstance(node, str) and PLACEHOLDER.search(node):
             items.append({"path": path, "kind": "placeholder", "value": node[:80]})
-        elif node is None and re.search(r"\.(phone|full_name)$|report_base_url|logo_url", path):
+        elif node is None and re.search(r"\.(phone|full_name)$|report_base_url|logo_url|brand\.(primary|accent|font_display|font_body)$", path):
             items.append({"path": path, "kind": "missing", "value": None})
 
     walk(cfg, "")
@@ -194,7 +196,21 @@ def main():
     d.add_argument("--answers")
     d.add_argument("--set", action="append", default=[])
     d.add_argument("--by", default="")
+    g = sub.add_parser("logo", help="embed a logo file into brand.logo_data_uri for the offline dashboard (downscaled to 120 px tall when Pillow is available)")
+    g.add_argument("--config", required=True)
+    g.add_argument("--file", required=True)
     args = ap.parse_args()
+    if args.cmd == "logo":
+        import base64, mimetypes
+        cfg = json.load(open(args.config)); data = open(args.file, "rb").read(); mime = mimetypes.guess_type(args.file)[0] or "image/png"
+        try:
+            from PIL import Image; import io
+            im = Image.open(io.BytesIO(data)).convert("RGBA"); h = 120
+            if im.height > h: im = im.resize((round(im.width * h / im.height), h))
+            buf = io.BytesIO(); im.save(buf, "PNG", optimize=True); data, mime = buf.getvalue(), "image/png"
+        except Exception: pass   # no Pillow: embed the file as given
+        cfg.setdefault("brand", {})["logo_data_uri"] = f"data:{mime};base64," + base64.b64encode(data).decode()
+        json.dump(cfg, open(args.config, "w"), indent=2); print(f"Logo embedded ({len(data) // 1024} KB, {mime}); the dashboard header will show it."); return
 
     if args.cmd == "init":
         if os.path.exists(args.dst):

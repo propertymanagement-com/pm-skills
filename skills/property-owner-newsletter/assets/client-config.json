@@ -7,7 +7,8 @@
   "pmcom_profile_url": "<PropertyManagement.com profile URL>",
   "pmid": 999999,
   "timezone": "<IANA timezone, e.g. America/New_York>",
-  "logo_url": "<logo URL>"
+  "logo_url": "<logo URL>",
+  "mcp_connector_url": "<your organization's connector URL from the Client Dashboard MCP page>"
  },
  "brand": {
   "primary": "#0B2545",
@@ -15,7 +16,10 @@
   "tint": "#E2E8F0",
   "font_display": "Georgia, 'Times New Roman', serif",
   "font_body": "'Helvetica Neue', Helvetica, Arial, sans-serif",
-  "_source": "[CONFIRM] Brand palette and fonts from the company's logo or style guide."
+  "_source": "[CONFIRM] Brand palette and fonts from the company's logo or style guide.",
+  "logo_data_uri": null,
+  "font_link": null,
+  "_logo_note": "logo_url: a hosted image for the email header (the logo on the company website works). logo_data_uri: a small PNG embedded with `setup_config.py logo --file <logo>` for the offline dashboard. font_link: optional web-font stylesheet URL for the email."
  },
  "sender": {
   "from_name": "<company name>",
@@ -67,7 +71,9 @@
   "call": 50,
   "watch": 25,
   "call_cap_total": 10,
-  "call_cap_per_manager": 5
+  "call_cap_per_manager": 5,
+  "long_vacancy_flag_days": 100,
+  "_long_vacancy_flag_days_note": "Vacancies this old leave the lists and the week's five and sit in the Flags section (no action this week); there is usually a reason the team already knows."
  },
  "newsletter": {
   "cadence": "monthly",

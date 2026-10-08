@@ -1,6 +1,6 @@
 # The PropertyManagement.com connector (MCP)
 
-The member connects Claude to **`https://mcp.propertymanagement.com/api/mcp/v1/orgs/<org-id>`** through Settings > Connectors > Add custom connector (browser sign-in, no key). Copy the org-specific URL from the PM.com Client Dashboard MCP page — never use the bare `/mcp` path. Access is enabled per organization by PropertyManagement.com. Tool names appear as `pm_*`.
+The member connects Claude to their organization's own URL, **`https://mcp.propertymanagement.com/api/mcp/v1/orgs/<org-id>`**, through Settings > Connectors > Add custom connector, then signs in with their PropertyManagement.com login (OAuth through app.propertymanagement.com; no key to paste). Copy the org-specific URL from the PM.com Client Dashboard MCP page; the setup also stores it in the client config as `company.mcp_connector_url`, so quote that value verbatim whenever you tell someone how to add the connector. There is no generic URL: the bare `/mcp` path returns 404. On a Claude Team or Enterprise plan a workspace admin adds the custom connector; everyone else hard-refreshes Claude, finds it under Settings > Connectors, and connects with their own PM.com login, or the admin connects it once for the whole organization. Access is enabled per organization by PropertyManagement.com. Tool names appear as `pm_*`.
 
 ## Start of every run
 
@@ -8,6 +8,10 @@ The member connects Claude to **`https://mcp.propertymanagement.com/api/mcp/v1/o
 2. **`pm_ping`** — confirms the connection and lists the directory company ids (`pmidAllowlist`). If this fails, the connector is not connected or not enabled: tell the user, then continue with uploaded files only and mark survey-derived tiles "not available".
 3. **`pm_org_get`** — organization name, PMID, website, logo. On first setup, pass the JSON to `setup_config.py seed --org-json …` before the guided checklist (see First run in `SKILL.md`).
 4. **`pm_benchmarks_get`** — dated verified-PM medians and owner-survey aggregates (`version`, `as_of`, `source`, `notes`, `certified_metrics[]`, `owner_survey[]`). Save the response to `<exports>/benchmarks.json` and pass `--benchmarks` to `build_newsletter.py`. Quote every number with **n** and the **as_of** date. If the connector is unavailable, say benchmarks are unavailable — do not invent medians.
+
+## Two guards before writing survey.json
+- **Right company?** `pm_org_get` returns the organization name and its pmids. If the name does not match `company.name` in the config (a person signed into the wrong PM.com account, or a test organization), say so and do not write `survey.json` from this connector; keep whatever `survey.json` is already in the folder.
+- **Never overwrite a good file with an empty pull.** If the overview reports zero responses, a tool errors, or the pull comes back shorter than the file already in the folder, keep the existing `survey.json`, say which date it carries, and move on. A connector hiccup must not erase last month's survey picture.
 
 ## Property owner surveys (works today)
 
