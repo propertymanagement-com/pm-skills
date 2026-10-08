@@ -1,0 +1,8 @@
+{
+  "name": "property-owner-retention-radar",
+  "description": "Weekly Property Owner Retention Radar from AppFolio exports and PM.com survey data",
+  "version": "0.1.0",
+  "author": {
+    "name": "PropertyManagement.com"
+  }
+}

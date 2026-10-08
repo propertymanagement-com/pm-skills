@@ -1,0 +1,22 @@
+{
+  "name": "pm-skills",
+  "description": "PropertyManagement.com packaged Claude skills for member property managers",
+  "owner": {
+    "name": "PropertyManagement.com",
+    "url": "https://propertymanagement.com"
+  },
+  "plugins": [
+    {
+      "name": "property-owner-retention-radar",
+      "source": "./skills/property-owner-retention-radar",
+      "description": "Weekly Property Owner Retention Radar from AppFolio exports and PM.com survey data",
+      "version": "0.1.0"
+    },
+    {
+      "name": "property-owner-newsletter",
+      "source": "./skills/property-owner-newsletter",
+      "description": "Monthly owner-specific Property Owner Update email package with merge files and review studio",
+      "version": "0.1.0"
+    }
+  ]
+}

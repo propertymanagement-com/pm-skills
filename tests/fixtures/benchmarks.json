@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "as_of": "2026-01-15",
+  "source": "PropertyManagement.com verified property manager program (synthetic test fixture)",
+  "notes": "Test fixture only.",
+  "certified_metrics": [
+    {"key": "lease_renewal_rate", "label": "Lease renewal rate", "median": 89.7, "unit": "%", "n_pms": 44},
+    {"key": "occupancy_rate", "label": "Occupancy rate", "median": 83.7, "unit": "%", "n_pms": 52},
+    {"key": "rent_collection_rate", "label": "Rent collection rate", "median": 97.7, "unit": "%", "n_pms": 25},
+    {"key": "repair_completion_median_days", "label": "Median days to complete a repair", "median": 9.0, "unit": "days", "n_pms": 43}
+  ],
+  "owner_survey": [
+    {"key": "nps_all_responses", "label": "NPS, all responses", "value": "+57"},
+    {"key": "median_pm_nps", "label": "Median PM NPS", "value": "+62", "n": 57},
+    {"key": "top_quartile_pm_nps", "label": "Top-quartile PM NPS", "value": "+81"},
+    {"key": "nps_maintenance_costs_in_line", "label": "NPS in line", "value": 73.5, "n": 1313},
+    {"key": "nps_maintenance_costs_somewhat_above", "label": "NPS somewhat above", "value": 8.1, "n": 1313}
+  ]
+}
