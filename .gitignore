@@ -5,3 +5,4 @@ __pycache__/
 client-config.local.json
 .pytest_cache/
 .venv/
+uv.lock
