@@ -1,0 +1,8 @@
+{
+  "name": "property-owner-newsletter",
+  "description": "Monthly owner-specific Property Owner Update email package",
+  "version": "0.1.0",
+  "author": {
+    "name": "PropertyManagement.com"
+  }
+}

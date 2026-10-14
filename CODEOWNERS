@@ -1,0 +1,7 @@
+# Org-owned; reviews go to the dev team
+/skills/ @propertymanagement-com/pm-com-dev
+
+# Scripts and automation
+/tools/ @propertymanagement-com/pm-com-dev
+/tests/ @propertymanagement-com/pm-com-dev
+/.github/ @propertymanagement-com/pm-com-dev

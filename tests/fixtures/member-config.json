@@ -1,0 +1,81 @@
+{
+ "company": {
+  "name": "Example Property Management",
+  "short_name": "Example PM",
+  "website": "https://www.example.com/",
+  "phone": "+1 555-0100-0001",
+  "pmcom_profile_url": "https://propertymanagement.com/property-manager/example-pm",
+  "pmid": 999999,
+  "timezone": "America/New_York",
+  "logo_url": "https://www.example.com/logo.png"
+ },
+ "brand": {
+  "primary": "#0B2545",
+  "accent": "#4A5568",
+  "tint": "#E2E8F0",
+  "font_display": "Georgia, serif",
+  "font_body": "Helvetica, Arial, sans-serif"
+ },
+ "sender": {
+  "from_name": "Example Property Management",
+  "reply_to": "owners@example.com"
+ },
+ "team": {
+  "managers": [
+   {"first_name": "Test", "full_name": "Test Manager", "phone": "+1 555-0100-0002"}
+  ],
+  "ops_lead": "Test Ops",
+  "comms_lead": "Test Comms",
+  "owner": "Test Owner"
+ },
+ "regions": {
+  "core_cities": ["Testville"],
+  "core_label": "Testville",
+  "other_label": "Suburbs"
+ },
+ "rent_gl_account": "4100",
+ "fees": {
+  "management_pct": 10,
+  "leasing_fee": "one month's rent",
+  "renewal_fee": "$100"
+ },
+ "risk_weights": {
+  "management_ending": 50,
+  "owner_exit_moveout": 40,
+  "detractor": 40,
+  "owner_exit_note": 30,
+  "vacancy_60": 25,
+  "cost_sig_above": 25,
+  "vacancy_30": 15,
+  "passive": 15,
+  "cost_above": 15,
+  "expiring_no_renewal": 10,
+  "delinquency": 10,
+  "first_year": 10,
+  "statements_confusing": 10,
+  "voicemail": 10,
+  "promoter": -20,
+  "testimonial": -10,
+  "payments_on_hold": 15,
+  "no_owner_payment_90d": 10,
+  "turn_open_45d": 10,
+  "prior_tenant_loss": 10
+ },
+ "risk_tiers": {"call": 50, "watch": 25, "call_cap_total": 10, "call_cap_per_manager": 5},
+ "newsletter": {
+  "cadence": "monthly",
+  "report_base_url": "https://example.com/owner-reports/",
+  "referral_line": "Know another owner? Introductions welcome.",
+  "company_block": "We refreshed our owner portal this month.",
+  "recommendation_rules": [],
+  "report_salt": "test-salt-for-fixtures-only",
+  "max_increase_pct": 5,
+  "compare": {"collections": true, "survey": true, "renewals": true, "renewal_within_pct": 5, "certifications": false},
+  "certifications_to_feature": [],
+  "show_rent_vs_market": true,
+  "report_link": false
+ },
+ "exclusions": {"management_end_date_set": true, "no_email": true},
+ "watch_tags": [],
+ "setup": {"completed_at": "2026-01-01T00:00:00", "completed_by": "pytest"}
+}

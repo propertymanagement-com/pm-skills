@@ -1,0 +1,21 @@
+{
+ "responses": [
+  {
+   "email": "owner1@example.com",
+   "name": "Test Owner 1",
+   "completed_at": "2026-01-10",
+   "nps": 9,
+   "score": 90.0,
+   "overall": "Very satisfied",
+   "leasing": "Very satisfied",
+   "vacancy": "Under 14 days",
+   "maintenance_comms": "Under 24 hours",
+   "maintenance_cost": "In line with market (fair value)",
+   "accounting": "Mostly easy to understand",
+   "call_response": "Picked up",
+   "comment": "",
+   "has_testimonial": false,
+   "testimonial_approved": false
+  }
+ ]
+}
