@@ -90,3 +90,23 @@ def test_newsletter_pipeline(tmp_path_factory):
     )
     assert (out / "newsletter" / "merge.csv").is_file()
     assert (out / "newsletter" / "build-summary.json").is_file()
+
+
+def test_package_skill_wraps_in_skill_folder_and_excludes_pycache():
+    import importlib.util
+    import py_compile
+    import zipfile
+
+    spec = importlib.util.spec_from_file_location("package", ROOT / "tools" / "package.py")
+    pkg = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(pkg)
+
+    for skill in ("property-owner-retention-radar", "property-owner-newsletter"):
+        py_compile.compile(str(ROOT / "skills" / skill / "scripts" / "pm_benchmarks.py"))
+        zip_path = pkg.package_skill(skill)
+        with zipfile.ZipFile(zip_path) as zf:
+            names = zf.namelist()
+        assert f"{skill}/SKILL.md" in names
+        assert all(n.startswith(f"{skill}/") for n in names), names
+        assert not any("__pycache__" in n or n.endswith((".pyc", ".pyo")) for n in names), names
+
