@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Property Manager Scorecards</title>
+<style>
+/* Property Manager Scorecards v1.0.0. Built by the property-manager-scorecards skill; edit the skill's template, never a built page. */
+:root {
+  --page: #f5f6f8; --card: #ffffff; --line: #e2e6eb; --soft: #f9fafc; --rule: #eef0f3;
+  --ink: #161d26; --muted: #616b7b; --navy: #12253b; --blue: #2958e9; --focus-ink: #c4d7fc;
+  --green: #24983f; --green-tint: #e5f6eb; --green-fade: #b3dbbc;
+  --amber: #d06d0c; --amber-tint: #fcf1df; --amber-fade: #efcda9;
+  --red: #d32825; --red-tint: #fce7e7; --red-fade: #f3b9b8;
+  --grey-tint: #eef0f3; --sel-row: #e5ecfd; --phone-fade: #b4c5f7; --mini: #89a3f3; --co-row: #f2f4f8;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; font-size: 14px; }
+.wrap { max-width: 1440px; margin: 0 auto; padding: 28px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; margin-bottom: 18px; min-width: 0; }
+.lbl { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.muted { color: var(--muted); }
+.g { color: var(--green); } .a { color: var(--amber); } .r { color: var(--red); }
+.hdr { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+h1 { font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -.01em; }
+.sub { margin-top: 4px; font-size: 15px; color: var(--muted); }
+.pill { background: var(--navy); color: #fff; font-size: 12px; font-weight: 700; letter-spacing: .08em; padding: 7px 14px; border-radius: 99px; white-space: nowrap; }
+.warn { background: var(--amber-tint); color: var(--ink); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; font-weight: 600; }
+.tabsrow { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+.tabs { display: inline-flex; flex-wrap: wrap; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 4px; gap: 2px; }
+.tab { border: 0; background: none; padding: 8px 16px; border-radius: 9px; cursor: pointer; font: inherit; font-size: 15px; color: var(--muted); }
+.tab b { color: var(--ink); margin-right: 6px; font-weight: 700; }
+.tab.sel { background: var(--navy); color: #a6adb5; }
+.tab.sel b { color: #fff; }
+.tab:focus-visible, .lb th:focus-visible, .lb tr:focus-visible, .cr:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.top { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 8px; }
+.eyebrow { color: var(--blue); font-size: 13px; font-weight: 800; letter-spacing: .14em; }
+.name { font-size: 32px; font-weight: 800; margin: 4px 0 0; letter-spacing: -.01em; }
+.count { font-size: 15px; color: var(--muted); }
+.halves { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 28px; margin-top: 20px; }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tile { background: var(--soft); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+.tile .v { font-size: 38px; font-weight: 800; margin: 8px 0 4px; line-height: 1.05; }
+.tile .s { font-size: 14px; color: var(--muted); }
+.tile .s b { margin-left: 2px; }
+.sec { margin-top: 22px; }
+.bar { display: flex; height: 16px; border-radius: 99px; overflow: hidden; margin: 10px 0 8px; background: var(--rule); }
+.leg { font-size: 15px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.call { display: flex; align-items: center; gap: 14px; border-radius: 12px; padding: 16px 18px; margin-top: 16px; font-weight: 700; font-size: 16px; }
+.ic { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none; }
+.qt { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.qt th { text-align: left; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 10px; border-bottom: 1px solid var(--line); }
+.qt td { padding: 12px 10px; border-top: 1px solid var(--rule); font-size: 16px; }
+.qt .n { text-align: right; font-variant-numeric: tabular-nums; }
+.tag { font-size: 12px; font-weight: 800; letter-spacing: .1em; margin-left: 10px; }
+.focus { display: flex; gap: 16px; align-items: center; background: var(--navy); border-radius: 12px; padding: 18px 20px; margin-top: 22px; color: var(--focus-ink); font-size: 17px; line-height: 1.45; }
+.focus b { color: #fff; }
+.empty { padding: 44px 0; text-align: center; color: var(--muted); font-size: 16px; }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.chart { padding-top: 6px; }
+.cr { display: flex; align-items: center; gap: 10px; height: 38px; cursor: pointer; }
+.cr .nm { width: 76px; text-align: right; font-size: 15px; color: var(--muted); flex: none; }
+.cr.sel .nm { color: var(--ink); font-weight: 700; }
+.cr .pl { position: relative; flex: 1; height: 100%; }
+.gl { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
+.bb { position: absolute; top: 7px; height: 24px; border-radius: 4px; }
+.axis { position: relative; height: 22px; margin-left: 86px; font-size: 14px; color: var(--muted); }
+.axis span { position: absolute; top: 4px; transform: translateX(-50%); }
+.lbhead { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.hint { font-size: 14px; color: var(--muted); }
+.lbwrap { overflow-x: auto; margin-top: 14px; }
+.lb { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.lb th { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 12px 10px; text-align: right; white-space: nowrap; cursor: pointer; background: var(--soft); user-select: none; }
+.lb th.l, .lb td.l { text-align: left; }
+.lb th.on { color: var(--ink); }
+.lb td { padding: 14px 10px; border-top: 1px solid var(--rule); text-align: right; font-size: 15px; white-space: nowrap; }
+.lb tr.row { cursor: pointer; }
+.lb tr.co td { background: var(--co-row); }
+.lb tr.co td.l { color: var(--muted); }
+.lb tr.un td { color: var(--muted); }
+.lb tr.sel td { background: var(--sel-row); }
+.lb td.nm { font-weight: 700; }
+.np { display: inline-block; padding: 3px 11px; border-radius: 99px; font-weight: 700; }
+.mb { display: inline-block; height: 6px; background: var(--mini); border-radius: 3px; margin-right: 8px; vertical-align: middle; }
+footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 10px; line-height: 1.5; }
+@media (max-width: 900px) {
+  .halves, .two { grid-template-columns: minmax(0, 1fr); }
+  .tiles { grid-template-columns: minmax(0, 1fr); }
+  .name { font-size: 26px; }
+  .tile .v { font-size: 30px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div><h1>Property Manager Scorecards</h1><div class="sub" id="sub"></div></div>
+    <span class="pill">LIVE · PM.COM MCP</span>
+  </div>
+  <div id="warn"></div>
+  <div class="tabsrow"><span class="lbl">Property manager</span><div class="tabs" id="tabs" role="tablist" aria-label="Property managers"></div></div>
+  <div class="card" id="sc" role="tabpanel"></div>
+  <div class="two">
+    <div class="card"><div class="lbl">NPS by property manager</div><div class="chart" id="c1"></div></div>
+    <div class="card"><div class="lbl">Phone answer rate by property manager</div><div class="chart" id="c2"></div></div>
+  </div>
+  <div class="card">
+    <div class="lbhead"><span class="lbl">Leaderboard by survey question</span><span class="hint">Click a column to rank by it · click a row to open that scorecard</span></div>
+    <div class="lbwrap"><table class="lb" id="lb"></table></div>
+  </div>
+  <footer id="ft"></footer>
+</div>
+<script>
+const D = /*__SCORECARD_DATA__*/null;
+(function () {
+  const $ = (id) => document.getElementById(id);
+  if (!D) { $('sc').innerHTML = '<div class="empty">No scorecard data in this page. Build it with the property-manager-scorecards skill.</div>'; return; }
+  const QK = D.questions;
+  const MG = D.managers;
+  const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const fromHash = () => { const h = slug(decodeURIComponent(location.hash.slice(1))); return h ? MG.findIndex((m) => slug(m.name) === h || slug(m.name).split('-')[0] === h) : -1; };
+  let SEL = fromHash() >= 0 ? fromHash() : Math.max(0, MG.findIndex((m) => m.scored));
+  window.addEventListener('hashchange', () => { const i = fromHash(); if (i >= 0) { SEL = i; render(); } });
+  let SORT = 'nps', DIR = -1;
+  const band = (v) => (v >= 50 ? 'g' : v >= 0 ? 'a' : 'r');
+  const pband = (v) => (v >= 75 ? 'g' : v >= 50 ? 'a' : 'r');
+  const COL = { g: 'var(--green)', a: 'var(--amber)', r: 'var(--red)' };
+  const TINT = { g: 'var(--green-tint)', a: 'var(--amber-tint)', r: 'var(--red-tint)' };
+  const FADE = { g: 'var(--green-fade)', a: 'var(--amber-fade)', r: 'var(--red-fade)' };
+  const sgn = (x, d) => { const s = Math.abs(x) < Math.pow(10, -d) / 2 ? (0).toFixed(d) : x.toFixed(d); return x > 0 && +s !== 0 ? '+' + s : s; };
+  const gc = (x) => (x > 0 ? 'g' : x < 0 ? 'r' : '');
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const PHONE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11 11 0 003.5.56 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.2.2 2.4.56 3.5a1 1 0 01-.25 1z"/></svg>';
+  const CHECK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>';
+  const TARGET = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="#fff"/></svg>';
+
+  function pick(i) { SEL = i; render(); }
+
+  function tabs() {
+    $('tabs').innerHTML = MG.map((m, i) => '<button class="tab' + (i === SEL ? ' sel' : '') + '" role="tab" aria-selected="' + (i === SEL) + '" data-i="' + i + '"><b>' + esc(m.name) + '</b>' + m.n + '</button>').join('');
+    $('tabs').querySelectorAll('.tab').forEach((b) => { b.onclick = () => pick(+b.dataset.i); });
+  }
+
+  function card() {
+    const m = MG[SEL], C = D.company;
+    let h = '<div class="top"><div><div class="eyebrow">ONE-ON-ONE SCORECARD</div><div class="name">' + esc(m.name) + '</div></div>' +
+      '<div class="count">' + m.n + ' property owner response' + (m.n === 1 ? '' : 's') + (m.small ? ' · small sample, read directionally' : '') + '</div></div>';
+    if (!m.scored) { $('sc').innerHTML = h + '<div class="empty">Needs 5 responses to score</div>'; return; }
+    const nd = m.nps - C.nps;
+    const pd = m.answered && C.answered ? Math.round(m.pickup) - Math.round(C.pickup) : null;
+    const sd = +(m.sat - C.sat).toFixed(1);
+    h += '<div class="halves"><div><div class="tiles">';
+    h += '<div class="tile"><div class="lbl">Net Promoter Score</div><div class="v ' + band(m.nps) + '">' + sgn(m.nps, 0) + '</div><div class="s">Company ' + sgn(C.nps, 0) + ' <b class="' + gc(nd) + '">' + sgn(nd, 0) + '</b></div></div>';
+    h += '<div class="tile"><div class="lbl">Phone pickup</div>' + (m.answered
+      ? '<div class="v ' + pband(m.pickup) + '">' + Math.round(m.pickup) + '%</div><div class="s">Company ' + Math.round(C.pickup) + '% <b class="' + gc(pd) + '">' + sgn(pd, 0) + ' pts</b></div>'
+      : '<div class="v">-</div><div class="s">No phone answers yet</div>') + '</div>';
+    h += '<div class="tile"><div class="lbl">Avg satisfaction (0–100)</div><div class="v">' + m.sat.toFixed(1) + '</div><div class="s">Company ' + C.sat.toFixed(1) + ' <b class="' + gc(sd) + '">' + sgn(sd, 1) + '</b></div></div></div>';
+    const t = Math.max(1, m.prom + m.pas + m.det);
+    h += '<div class="sec"><div class="lbl">Their property owners</div><div class="bar">' +
+      '<div style="width:' + (100 * m.prom / t) + '%;background:var(--green)"></div><div style="width:' + (100 * m.pas / t) + '%;background:var(--amber)"></div><div style="width:' + (100 * m.det / t) + '%;background:var(--red)"></div></div>' +
+      '<div class="leg"><span><b class="g">' + m.prom + '</b> promoter' + (m.prom === 1 ? '' : 's') + '</span><span><b class="a">' + m.pas + '</b> passive' + (m.pas === 1 ? '' : 's') + '</span><span><b class="r">' + m.det + '</b> detractor' + (m.det === 1 ? '' : 's') + '</span></div></div>';
+    let bg, ic, tx, icon = PHONE;
+    if (m.det === 0) { bg = 'var(--green-tint)'; ic = 'var(--green)'; tx = 'None of their property owners are detractors'; icon = CHECK; }
+    else if (m.vmd === 0) { bg = 'var(--grey-tint)'; ic = 'var(--muted)'; tx = 'Their detractors skipped the phone question'; }
+    else { bg = 'var(--red-tint)'; ic = 'var(--red)'; tx = m.vm + ' of ' + m.vmd + ' of their detractors hit voicemail when they called (' + Math.round(100 * m.vm / m.vmd) + '%)'; }
+    h += '<div class="call" style="background:' + bg + '"><span class="ic" style="background:' + ic + '">' + icon + '</span><span>' + tx + '</span></div></div>';
+    h += '<div><div class="lbl">By survey question · average out of 10</div><table class="qt"><thead><tr><th>Question</th><th class="n">Them</th><th class="n">Company</th><th class="n">Gap</th></tr></thead><tbody>';
+    QK.forEach((k) => {
+      const x = m.q[k];
+      let style = '', tag = '';
+      if (k === m.strength) { style = ' style="background:var(--green-tint)"'; tag = '<span class="tag g">STRENGTH</span>'; }
+      else if (k === m.biggap) { style = ' style="background:var(--amber-tint)"'; tag = '<span class="tag a">BIGGEST GAP</span>'; }
+      h += '<tr' + style + '><td>' + esc(k) + tag + '</td><td class="n"><b>' + (x.v == null ? '-' : x.v.toFixed(1)) + '</b></td><td class="n muted">' + (x.c == null ? '-' : x.c.toFixed(1)) + '</td><td class="n"><b class="' + (x.gap == null ? '' : gc(x.gap)) + '">' + (x.gap == null ? '-' : sgn(x.gap, 1)) + '</b></td></tr>';
+    });
+    h += '</tbody></table></div></div>';
+    h += '<div class="focus"><span class="ic" style="background:var(--blue)">' + TARGET + '</span><div><b>Focus for the next 90 days:</b> ' + esc(m.focus || '') + '</div></div>';
+    $('sc').innerHTML = h;
+  }
+
+  function charts() {
+    const S = MG.filter((m) => m.scored);
+    function mk(id, key, min, max, step, fmt, color) {
+      let h = '';
+      S.forEach((m) => {
+        const i = MG.indexOf(m), sel = i === SEL;
+        if (key === 'pickup' && !m.answered) return;
+        const v = m[key], span = max - min;
+        const pos = (Math.max(min, Math.min(v, max)) - min) / span * 100, zero = (0 - min) / span * 100;
+        const left = key === 'nps' ? Math.min(zero, pos) : 0, width = key === 'nps' ? Math.abs(pos - zero) : pos;
+        h += '<div class="cr' + (sel ? ' sel' : '') + '" data-i="' + i + '" title="' + esc(m.name) + ': ' + fmt(v) + '"><div class="nm">' + esc(m.name) + '</div><div class="pl">';
+        for (let g = min; g <= max; g += step) h += '<div class="gl" style="left:' + ((g - min) / span * 100) + '%"></div>';
+        h += '<div class="bb" style="left:' + left + '%;width:' + width + '%;background:' + color(m, sel) + '"></div></div></div>';
+      });
+      h += '<div class="axis">';
+      for (let g = min; g <= max; g += step) h += '<span style="left:' + ((g - min) / (max - min) * 100) + '%">' + (key === 'nps' ? g : g + '%') + '</span>';
+      $(id).innerHTML = h + '</div>';
+      $(id).querySelectorAll('.cr').forEach((e) => { e.onclick = () => pick(+e.dataset.i); });
+    }
+    mk('c1', 'nps', -100, 100, 20, (v) => sgn(v, 0), (m, s) => (s ? COL : FADE)[band(m.nps)]);
+    mk('c2', 'pickup', 0, 100, 10, (v) => Math.round(v) + '%', (m, s) => (s ? 'var(--blue)' : 'var(--phone-fade)'));
+  }
+
+  const COLS = [['nps', 'NPS'], ['pickup', 'Phone pickup'], ['Overall satisfaction', 'Overall'], ['Tenant placement', 'Leasing'], ['Vacancy time', 'Vacancy'], ['Maintenance response speed', 'Maint. speed'], ['Maintenance cost value', 'Maint. cost'], ['Financial statements', 'Statements']];
+  const val = (m, k) => (k === 'nps' ? m.nps : k === 'pickup' ? (m.answered ? m.pickup : null) : m.q[k].v);
+
+  function lb() {
+    const S = MG.filter((m) => m.scored), U = MG.filter((m) => !m.scored);
+    const ranked = S.slice().sort((a, b) => {
+      const va = val(a, SORT), vb = val(b, SORT);
+      if (va == null && vb == null) return 0; if (va == null) return 1; if (vb == null) return -1;
+      return DIR * (va - vb);
+    }).concat(U);
+    const best = {}, worst = {};
+    COLS.forEach(([k]) => {
+      const vs = S.map((m) => val(m, k)).filter((v) => v != null).map((v) => (k === 'pickup' ? Math.round(v) : v));
+      if (vs.length >= 3) { best[k] = Math.max(...vs); worst[k] = Math.min(...vs); }
+    });
+    function cell(m, k, kind) {
+      if (kind === 'unscored') return '<td>-</td>';
+      const v = val(m, k);
+      if (v == null) return '<td>-</td>';
+      let cls = '';
+      if (kind === 'mgr' && best[k] !== undefined && best[k] !== worst[k]) {
+        const cv = k === 'pickup' ? Math.round(v) : v;
+        if (cv === best[k]) cls = 'g'; else if (cv === worst[k]) cls = 'r';
+      }
+      if (k === 'nps') return kind === 'un' ? '<td><b>' + sgn(v, 0) + '</b></td>' : '<td><span class="np" style="background:' + TINT[band(v)] + ';color:' + COL[band(v)] + '">' + sgn(v, 0) + '</span></td>';
+      if (k === 'pickup') return '<td class="' + cls + '">' + Math.round(v) + '%</td>';
+      return '<td class="' + cls + '"><span class="mb" style="width:' + Math.round(v * 5) + 'px"></span>' + v.toFixed(1) + '</td>';
+    }
+    let h = '<thead><tr><th class="l">#</th><th class="l">Property manager</th><th>Responses</th>' +
+      COLS.map(([k, label]) => '<th data-k="' + k + '" tabindex="0"' + (SORT === k ? ' class="on"' : '') + '>' + label.toUpperCase() + (SORT === k ? (DIR < 0 ? ' ▾' : ' ▴') : '') + '</th>').join('') + '</tr></thead><tbody>';
+    const row = (m, rank, cls, kind, name, i) => '<tr class="' + cls + '"' + (i != null ? ' data-i="' + i + '" tabindex="0"' : '') + '><td class="l">' + rank + '</td><td class="l' + (kind === 'mgr' || kind === 'unscored' ? ' nm' : '') + '">' + esc(name) + '</td><td>' + m.n + '</td>' + COLS.map(([k]) => cell(m, k, kind)).join('') + '</tr>';
+    h += row(D.company, '', 'co', 'co', D.company_name + ' (all)', null);
+    if (D.unassigned && D.unassigned.n) h += row(D.unassigned, '', 'un', 'un', D.unassigned.name, null);
+    ranked.forEach((m, j) => {
+      const i = MG.indexOf(m);
+      h += row(m, m.scored ? j + 1 : '-', 'row' + (i === SEL ? ' sel' : ''), m.scored ? 'mgr' : 'unscored', m.name, i);
+    });
+    $('lb').innerHTML = h + '</tbody>';
+    $('lb').querySelectorAll('th[data-k]').forEach((t) => {
+      const go = () => { const k = t.dataset.k; if (SORT === k) DIR = -DIR; else { SORT = k; DIR = -1; } lb(); };
+      t.onclick = go; t.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } };
+    });
+    $('lb').querySelectorAll('tr[data-i]').forEach((t) => {
+      t.onclick = () => pick(+t.dataset.i);
+      t.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(+t.dataset.i); } };
+    });
+  }
+
+  function render() { tabs(); card(); charts(); lb(); }
+  $('sub').textContent = 'Property Owner Survey · ' + D.company_name + ' · PropertyManagement.com MCP';
+  $('ft').textContent = D.footer;
+  if (D.warning) $('warn').innerHTML = '<div class="warn">' + esc(D.warning) + '</div>';
+  render();
+})();
+</script>
+</body>
+</html>

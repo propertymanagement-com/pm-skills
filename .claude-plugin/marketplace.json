@@ -17,6 +17,12 @@
       "source": "./skills/property-owner-newsletter",
       "description": "Monthly owner-specific Property Owner Update email package with merge files and review studio",
       "version": "0.1.0"
+    },
+    {
+      "name": "property-manager-scorecards",
+      "source": "./skills/property-manager-scorecards",
+      "description": "One-on-one scorecard for every property manager from TrueMatch owner survey responses and the member's team roster",
+      "version": "1.0.0"
     }
   ]
 }

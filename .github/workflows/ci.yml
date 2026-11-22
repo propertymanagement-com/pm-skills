@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install pytest
+      - run: pip install pytest openpyxl
       - run: pytest
       - run: python3 tools/check_public_safety.py .
       - run: python3 tools/package.py
@@ -30,7 +30,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install pytest && pytest && python3 tools/check_public_safety.py . && python3 tools/package.py
+      - run: pip install pytest openpyxl && pytest && python3 tools/check_public_safety.py . && python3 tools/package.py
       - name: Install gitleaks CLI
         run: |
           curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.28.0/gitleaks_8.28.0_linux_x64.tar.gz | tar -xz -C /usr/local/bin gitleaks
@@ -40,6 +40,7 @@ jobs:
           files: |
             dist/property-owner-retention-radar.zip
             dist/property-owner-newsletter.zip
+            dist/property-manager-scorecards.zip
 
   gitleaks:
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')

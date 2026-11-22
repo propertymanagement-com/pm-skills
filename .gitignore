@@ -6,3 +6,4 @@ client-config.local.json
 .pytest_cache/
 .venv/
 uv.lock
+tests/property-manager-scorecards/out/
