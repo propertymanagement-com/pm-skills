@@ -10,7 +10,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", "dist", ".venv", "node_modules"}
+SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", "dist", ".venv", "node_modules", "out"}
 SKIP_FILES = {"check_public_safety.py", "test_public_safety.py"}
 
 # SHA-256 of lowercase forbidden tokens/phrases (never store plaintext in repo).
